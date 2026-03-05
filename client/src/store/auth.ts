@@ -1,11 +1,22 @@
 import { reactive } from 'vue'
 import axios from 'axios'
 
+interface RegisterData {
+    username: string
+    password: string
+    firstName: string
+    lastName: string
+    middleName: string
+    phone: string
+    email: string
+    birthDate: string
+}
+
 interface AuthState {
     token: string | null
     role: string | null
     login: (username: string, password: string) => Promise<void>
-    register: (username: string, password: string, role: string) => Promise<void>
+    register: (data: RegisterData) => Promise<void>
     logout: () => void
 }
 
@@ -21,13 +32,17 @@ export const auth = reactive<AuthState>({
         localStorage.setItem('role', this.role!)
     },
 
-    async register(username, password, role) {
-        await axios.post('http://localhost:5000/auth/register', { username, password, role })
+    async register(data) {
+        await axios.post('http://localhost:5000/auth/register', {
+            ...data,
+            role: 'user' // принудительно
+        })
     },
 
     logout() {
         this.token = null
         this.role = null
-        localStorage.clear()
+        localStorage.removeItem('token')
+        localStorage.removeItem('role')
     }
 })
