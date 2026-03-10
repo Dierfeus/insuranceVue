@@ -1,5 +1,6 @@
 export enum RolesEnum {
     agent = "Агент",
     user = "Пользователь",
-    expert = "Актурий"
+    expert = "Актурий",
+    inspector = "Актуарий"
 }

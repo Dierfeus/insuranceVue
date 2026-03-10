@@ -1,5 +1,6 @@
 import { reactive } from 'vue'
 import axios from 'axios'
+import router from "../router";
 
 interface RegisterData {
     username: string
@@ -30,12 +31,14 @@ export const auth = reactive<AuthState>({
         this.role = res.data.role
         localStorage.setItem('token', this.token!)
         localStorage.setItem('role', this.role!)
+
+        router.push('/dashboard')
     },
 
     async register(data) {
         await axios.post('http://localhost:5000/auth/register', {
             ...data,
-            role: 'user' // принудительно
+            role: 'user'
         })
     },
 

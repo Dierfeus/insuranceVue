@@ -5,9 +5,9 @@ import dotenv from 'dotenv'
 import authRoutes from './routes/auth.router.ts'
 import claimRoutes from './routes/claims.router.ts'
 import programRoutes from './routes/programs.router.ts'
-import userRoutes from './routes/users.ts'
+import userRoutes from './routes/users.router.ts'
 import propertyRoutes from './routes/property.router.ts'
-import contractRoutes from './routes/contracts.ts'
+import contractRoutes from './routes/contracts.router.ts'
 
 
 

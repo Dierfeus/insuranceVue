@@ -1,85 +1,85 @@
 <template>
-  <div class="max-w-4xl mx-auto">
-    <h2 class="text-2xl font-bold mb-6 text-blue-600">Личный кабинет</h2>
+  <div class="max-w-6xl mx-auto p-4">
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <!-- Кнопки для всех пользователей -->
-      <router-link
-          v-if="role === 'user'"
-          :to="`/${role}/profile`"
-          class="bg-white shadow rounded-xl p-6 hover:shadow-lg transition"
-      >
+    <!-- Вкладки -->
+    <div class="flex gap-4 mb-6 border-b pb-2 flex-wrap">
+
+      <!-- Пользователь -->
+      <button v-if="role==='user'" :class="tab==='myClaims'?activeTabClass:tabClass" @click="tab='myClaims'">
+        📑 Мои заявки
+      </button>
+      <button v-if="role==='user'" :class="tab==='profile'?activeTabClass:tabClass" @click="tab='profile'">
         👤 Профиль
-      </router-link>
+      </button>
 
-      <router-link
-          v-if="role === 'user' || role === 'agent'"
-          :to="`/${role}/programs`"
-          class="bg-white shadow rounded-xl p-6 hover:shadow-lg transition"
-      >
-        📑 Программы страхования
-      </router-link>
 
-      <router-link
-          v-if="role === 'user'"
-          :to="`/${role}/claims`"
-          class="bg-white shadow rounded-xl p-6 hover:shadow-lg transition"
-      >
-        📑 Создать заявку
-      </router-link>
 
-      <!-- Кнопки для агента -->
-      <router-link
-          v-if="role === 'agent'"
-          :to="`/${role}/clients`"
-          class="bg-white shadow rounded-xl p-6 hover:shadow-lg transition"
-      >
-        👤 Управление клиентами
-      </router-link>
+      <!-- Агент -->
+      <button v-if="role==='agent'" :class="tab==='claims'?activeTabClass:tabClass" @click="tab='claims'">
+        📑 Заявки
+      </button>
+      <button v-if="role==='agent'" :class="tab==='createClaim'?activeTabClass:tabClass" @click="tab='createClaim'">
+        ➕ Создать заявку
+      </button>
+      <button v-if="role==='agent'" :class="tab==='contracts'?activeTabClass:tabClass" @click="tab='contracts'">
+        📑 Договоры
+      </button>
+      <button v-if="role==='agent'" :class="tab==='createContract'?activeTabClass:tabClass" @click="tab='createContract'">
+        ➕ Создать договор
+      </button>
+      <button v-if="role==='agent'" :class="tab==='clients'?activeTabClass:tabClass" @click="tab='clients'">
+        👥 Клиенты
+      </button>
 
-      <router-link
-          v-if="role === 'agent'"
-          :to="`/${role}/property`"
-          class="bg-white shadow rounded-xl p-6 hover:shadow-lg transition"
-      >
-        📑 Перечень имущества от оценщика
-      </router-link>
 
-      <router-link
-          v-if="role === 'agent'"
-          :to="`/${role}/contracts`"
-          class="bg-white shadow rounded-xl p-6 hover:shadow-lg transition"
-      >
-        📑 Договоры с клиентами
-      </router-link>
 
-      <!-- Кнопки для инспектора -->
-      <router-link
-          v-if="role === 'inspector'"
-          :to="`/${role}/property`"
-          class="bg-white shadow rounded-xl p-6 hover:shadow-lg transition"
-      >
-        📑 Оценка имущества
-      </router-link>
+      <!-- Оценщик -->
+      <button v-if="role==='inspector'" :class="tab==='property'?activeTabClass:tabClass" @click="tab='property'">
+        🏠 Оценка имущества
+      </button>
 
-      <!-- Кнопки для эксперта -->
-      <router-link
-          v-if="role === 'expert'"
-          :to="`/${role}/reports`"
-          class="bg-white shadow rounded-xl p-6 hover:shadow-lg transition"
-      >
-        📑 Экспертные отчёты
-      </router-link>
+
+
+      <!-- Эксперт -->
+      <button v-if="role==='expert' || role==='actuary'" :class="tab==='claims'?activeTabClass:tabClass" @click="tab='claims'">
+        📑 Заявки
+      </button>
+    </div>
+
+    <!-- Вкладки контента -->
+    <div>
+      <!-- Мои заявки (для пользователя) -->
+      <div v-if="tab==='myClaims' && role==='user'">
+        <UserClaims />
+      </div>
+
+      <!-- Профиль пользователя -->
+      <div v-if="tab==='profile' && role==='user'">
+        <UserProfile :userId="userId" />
+      </div>
+
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import UserProfile from './User/UserProfile.vue'
+import UserClaims from './User/UserClaims.vue'
 
-const role = ref<string | null>(null)
+const role = ref<string|null>(null)
+const tab = ref<string>('myClaims') // по умолчанию вкладка "Мои заявки"
+const userId = ref<string|null>(null)
 
 onMounted(() => {
-  role.value = localStorage.getItem('role') // роль берём из localStorage
+  role.value = localStorage.getItem('role')
+  userId.value = localStorage.getItem('userId')
 })
+
+const tabClass = 'px-3 py-1 rounded hover:bg-gray-100 cursor-pointer'
+const activeTabClass = 'px-3 py-1 rounded bg-blue-600 text-white cursor-pointer'
 </script>
+
+<style scoped>
+button { transition: all 0.2s; }
+</style>

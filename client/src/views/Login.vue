@@ -24,7 +24,7 @@ const router = useRouter()
 const login = async () => {
     try {
         await auth.login(username.value, password.value)
-        router.push('/' + auth.role)
+        router.push('/dashboard')
     } catch (err) {
         alert('Ошибка входа')
     }

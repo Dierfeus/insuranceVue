@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import {auth} from './store/auth'
-import {useRouter} from 'vue-router'
-import {RolesEnum} from "./type/RolesEnum.ts";
-import {computed} from "vue";
+import { auth } from './store/auth'
+import { useRouter } from 'vue-router'
+import { RolesEnum } from './type/RolesEnum.ts'
+import { computed } from 'vue'
 
 const router = useRouter()
 
@@ -12,7 +12,7 @@ const logout = () => {
 }
 
 const UserRole = computed((): string => {
-  if (!auth.role) return "Unknown"
+  if (!auth.role) return 'Unknown'
 
   const role = auth.role as keyof typeof RolesEnum
   return RolesEnum[role]
@@ -20,21 +20,59 @@ const UserRole = computed((): string => {
 </script>
 
 <template>
-  <!-- Навигация -->
-  <div class="min-h-screen bg-gray-50">
-    <header class="bg-blue-600 text-white p-4 flex justify-between items-center">
-      <h1 class="text-xl font-bold">Страхование какое-то там)</h1>
-      <div v-if="auth.token">
-        <span class="mr-4">Роль: {{ UserRole }}</span>
-        <button @click="logout" class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 transition">
-          Выйти
-        </button>
+  <div class="min-h-screen bg-gray-50 flex flex-col">
+
+    <!-- Хедер -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+      <div class="max-w-6xl mx-auto flex items-center justify-between p-4 md:p-6">
+
+        <!-- Логотип -->
+        <div class="flex items-center gap-3 cursor-pointer" @click="router.push('/')">
+          <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+            SI
+          </div>
+          <span class="text-2xl font-bold text-blue-600">SafeInsure</span>
+        </div>
+
+        <!-- Навигация и информация о пользователе -->
+        <div class="flex items-center gap-4 md:gap-6">
+
+          <span v-if="auth.token" class="text-gray-700 font-medium hidden sm:inline">
+            Роль: <span class="font-semibold text-blue-600">{{ UserRole }}</span>
+          </span>
+
+          <button
+              v-if="auth.token"
+              @click="logout"
+              class="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600 transition-all flex items-center gap-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-10V5"/>
+            </svg>
+            Выйти
+          </button>
+
+        </div>
+
       </div>
     </header>
 
-    <!-- Основной контент через router-view -->
-    <main class="p-6">
-      <router-view/>
+    <!-- Основной контент -->
+    <main class="flex-1 p-6 max-w-6xl mx-auto w-full">
+      <router-view />
     </main>
+
   </div>
 </template>
+
+<style scoped>
+header {
+  transition: all 0.3s ease;
+}
+header:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+button svg {
+  stroke-width: 2;
+}
+</style>
