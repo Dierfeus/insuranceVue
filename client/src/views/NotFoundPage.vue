@@ -20,8 +20,8 @@
 
 <style scoped>
 /* Плавная анимация кнопки */
-.router-link:hover {
+/* .router-link:hover {
   transform: scale(1.05);
   transition: transform 0.2s;
-}
+} */
 </style>
