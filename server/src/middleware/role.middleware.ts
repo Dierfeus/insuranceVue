@@ -1,4 +1,4 @@
-import type { Request, Response, NextFunction } from 'express'
+import type { Response, NextFunction } from 'express'
 
 type Role = string | string[]
 
