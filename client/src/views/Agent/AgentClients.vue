@@ -90,17 +90,6 @@ onMounted(loadClients)
 <template>
   <div class="max-w-6xl mx-auto">
 
-    <!-- Заголовок и кнопка назад -->
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-2xl font-bold text-blue-600">Клиенты</h2>
-      <router-link
-          to="/dashboard"
-          class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition"
-      >
-        ← Назад
-      </router-link>
-    </div>
-
     <!-- Список клиентов -->
     <div v-for="client in clients" :key="client._id"
          class="bg-white shadow p-4 mb-3 rounded-xl flex justify-between items-center">
@@ -113,6 +102,7 @@ onMounted(loadClients)
       <button @click="editClient(client)" class="bg-yellow-500 text-white px-3 py-1 rounded">
         Изменить
       </button>
+
     </div>
 
     <!-- Модальное окно редактирования -->
@@ -153,15 +143,7 @@ onMounted(loadClients)
             <input v-model="birthDateString" type="date" class="w-full border rounded-lg p-2" />
           </div>
 
-          <div>
-            <label class="block text-sm font-semibold">Роль</label>
-            <select v-model="selectedClient.role" class="w-full border rounded-lg p-2">
-              <option value="user">Пользователь</option>
-              <option value="agent">Агент</option>
-              <option value="inspector">Оценщик</option>
-              <option value="expert">Эксперт</option>
-            </select>
-          </div>
+
 
           <button type="submit" :disabled="loading" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
             Сохранить

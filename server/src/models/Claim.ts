@@ -6,7 +6,7 @@ export interface IClaim {
     propertyData: any                           // данные об имуществе, структура зависит от программы
     startDate: string                           // желаемая дата начала
     durationDays: number                        // срок страхования в днях
-    status: 'pending' | 'approved' | 'rejected' | 'evaluated' | 'priced' | 'closed'
+    status: 'new' | 'accepted' | 'rejected' | 'inspection' | 'priced' | 'contract_created'
     evaluation?: {
         value: number                           // оценочная стоимость имущества
         evaluator: mongoose.Types.ObjectId      // оценщик
