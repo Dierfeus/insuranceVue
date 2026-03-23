@@ -30,13 +30,18 @@ const form = reactive({
 
 const loadPrograms = async () => {
   try {
+
     const res = await axios.get(
         'http://localhost:5000/api/programs',
         { headers:{ Authorization:`Bearer ${token}` }}
     )
+
     programs.value = res.data
+
   } catch (err) {
+
     console.error('Ошибка загрузки программ')
+
   }
 }
 
@@ -76,7 +81,6 @@ const submitClaim = async () => {
 }
 
 onMounted(loadPrograms)
-
 </script>
 
 

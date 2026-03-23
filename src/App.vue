@@ -11,6 +11,11 @@ const logout = () => {
   router.push('/')
 }
 
+const goToProfile = () => {
+  router.push('/profile') // Убедитесь, что такой путь настроен в router/index.ts
+}
+
+
 const UserRole = computed((): string => {
   if (!auth.role) return 'Unknown'
 
@@ -37,9 +42,16 @@ const UserRole = computed((): string => {
         <!-- Навигация и информация о пользователе -->
         <div class="flex items-center gap-4 md:gap-6">
 
-          <span v-if="auth.token" class="text-gray-700 font-medium hidden sm:inline">
-            Роль: <span class="font-semibold text-blue-600">{{ UserRole }}</span>
-          </span>
+          <button
+              v-if="(auth.token)"
+              @click="goToProfile"
+              class="flex items-center gap-2 px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-all font-medium"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            <span>Профиль</span>
+          </button>
 
           <button
               v-if="auth.token"

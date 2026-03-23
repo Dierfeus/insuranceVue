@@ -120,7 +120,6 @@ import axios from 'axios'
 const claims = ref<any[]>([])
 const programs = ref<any[]>([])
 const showCreateClaim = ref(false)
-const userId = ref<string|null>(null)
 
 const today = new Date()
 const minStartDate = today.toISOString().split('T')[0]
@@ -177,7 +176,6 @@ const submitClaim = async () => {
     await axios.post(
         'http://localhost:5000/api/claims',
         {
-          user: userID,
           programId: newClaim.programId,
           propertyInfo: newClaim.propertyInfo,
           durationDays: newClaim.durationDays,
@@ -205,6 +203,5 @@ const formatDate = (d: string) => new Date(d).toLocaleDateString()
 onMounted(async () => {
   await loadPrograms()
   await loadClaims()
-  userId.value = localStorage.getItem('userId')
 })
 </script>

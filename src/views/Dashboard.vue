@@ -94,7 +94,7 @@ onMounted(() => {
   role.value = localStorage.getItem('role')
   userId.value = localStorage.getItem('userId')
 })
-console.log('Роль пользователя:', role)
+
 const tabClass = 'px-3 py-1 rounded hover:bg-gray-100 cursor-pointer'
 const activeTabClass = 'px-3 py-1 rounded bg-blue-600 text-white cursor-pointer'
 </script>
