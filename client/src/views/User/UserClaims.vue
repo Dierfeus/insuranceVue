@@ -34,13 +34,21 @@
           </select>
         </div>
 
-        <div v-if="selectedProgramType==='house' || selectedProgramType==='car'">
-          <label class="block mb-1 font-semibold">
-            {{ selectedProgramType==='house' ? 'Адрес' : 'Модель автомобиля' }}
-          </label>
+        <!-- Дом -->
+        <div v-if="selectedProgramType === 'home'">
+          <label class="block mb-1 font-semibold">Адрес</label>
           <input
-              v-model="newClaim.propertyInfo"
-              type="text"
+              v-model="newClaim.propertyData.address"
+              class="w-full border rounded-lg p-2"
+              required
+          />
+        </div>
+
+        <!-- Машина -->
+        <div v-if="selectedProgramType === 'car'">
+          <label class="block mb-1 font-semibold">Модель автомобиля</label>
+          <input
+              v-model="newClaim.propertyData.carModel"
               class="w-full border rounded-lg p-2"
               required
           />
@@ -95,18 +103,26 @@
           <p><strong>Дата начала:</strong> {{ formatDate(claim.startDate) }}</p>
         </div>
 
-        <div class="text-right">
-          <p
-              :class="{
-              'text-yellow-600': claim.status === 'pending',
-              'text-green-600': claim.status === 'approved',
-              'text-red-600': claim.status === 'rejected'
-            }"
+        <div class="text-right space-y-2">
+          <p :class="{
+      'text-yellow-600': claim.status === 'pending',
+      'text-green-600': claim.status === 'approved',
+      'text-red-600': claim.status === 'rejected'
+    }"
               class="font-semibold"
-          >
-            {{ claim.status }}
+          >{{claimstatus}}
           </p>
+
+          <!-- КНОПКА УДАЛЕНИЯ -->
+          <button
+              v-if="claim.status === 'pending'"
+              @click="deleteClaim(claim._id)"
+              class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition text-sm"
+          >
+            Удалить
+          </button>
         </div>
+
       </div>
     </div>
 
@@ -126,12 +142,22 @@ const minStartDate = today.toISOString().split('T')[0]
 
 const newClaim = reactive({
   programId: '',
-  propertyInfo: '',
+  propertyData: {
+    address: '',
+    carModel: ''
+  },
   durationDays: 7,
   startDate: ''
 })
 
 const token = localStorage.getItem('token')
+
+const Status = computed((): string => {
+
+  const claimstatus = claim.status as keyof typeof StatusEnum
+  return StatusEnum[claim.status]
+})
+
 
 // Загрузка моих заявок
 const loadClaims = async () => {
@@ -143,7 +169,10 @@ const loadClaims = async () => {
     claims.value = res.data.map(c => ({
       ...c,
       programName: c.program?.name || '-',
-      propertyInfo: c.propertyInfo || ''
+      propertyInfo:
+          c.propertyData?.address ||
+          c.propertyData?.carModel ||
+          '-'
     }))
   } catch (err) {
     console.error('Ошибка загрузки заявок', err)
@@ -165,7 +194,9 @@ const loadPrograms = async () => {
 
 // Тип выбранной программы
 const selectedProgramType = computed(() => {
-  const program = programs.value.find(p => p._id === newClaim.programId)
+  const program = programs.value.find(
+      p => String(p._id) === String(newClaim.programId)
+  )
   return program ? program.type : ''
 })
 
@@ -173,28 +204,50 @@ const selectedProgramType = computed(() => {
 const submitClaim = async () => {
   try {
     if (!token) return
+
     await axios.post(
         'http://localhost:5000/api/claims',
         {
-          programId: newClaim.programId,
-          propertyInfo: newClaim.propertyInfo,
+          program: newClaim.programId,
+          propertyData: newClaim.propertyData,
           durationDays: newClaim.durationDays,
           startDate: newClaim.startDate
         },
         { headers: { Authorization: `Bearer ${token}` } }
     )
-    // Очистка формы
+
     Object.assign(newClaim, {
       programId: '',
-      propertyInfo: '',
+      propertyData: {
+        address: '',
+        carModel: ''
+      },
       durationDays: 7,
       startDate: ''
     })
+
     showCreateClaim.value = false
     await loadClaims()
   } catch (err) {
     console.error(err)
     alert('Ошибка создания заявки')
+  }
+}
+
+const deleteClaim = async (id: string) => {
+  try {
+    if (!token) return
+
+    if (!confirm('Удалить заявку?')) return
+
+    await axios.delete(`http://localhost:5000/api/claims/${id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+
+    await loadClaims()
+  } catch (err) {
+    console.error(err)
+    alert('Ошибка удаления')
   }
 }
 

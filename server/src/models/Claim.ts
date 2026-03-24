@@ -1,47 +1,78 @@
-import mongoose from 'mongoose'
+import mongoose, { Document } from 'mongoose'
 
+// Основной интерфейс
 export interface IClaim {
-    user: mongoose.Types.ObjectId               // клиент
-    program: mongoose.Types.ObjectId           // ссылка на выбранную программу
-    propertyData: any                           // данные об имуществе, структура зависит от программы
-    startDate: string                           // желаемая дата начала
-    durationDays: number                        // срок страхования в днях
-    status: 'new' | 'accepted' | 'rejected' | 'inspection' | 'priced' | 'contract_created'
+    user: mongoose.Types.ObjectId
+    program: mongoose.Types.ObjectId
+
+    propertyData: {
+        address?: string
+        carModel?: string
+    }
+
+    startDate: string
+    durationDays: number
+
+    status: 'pending' | 'approved' | 'rejected' | 'evaluated' | 'priced' | 'closed'
+
     evaluation?: {
-        value: number                           // оценочная стоимость имущества
-        evaluator: mongoose.Types.ObjectId      // оценщик
+        value: number
+        evaluator: mongoose.Types.ObjectId
         date: string
     }
+
     premium?: {
-        amount: number                          // страховая сумма
+        amount: number
         actuary: mongoose.Types.ObjectId
         date: string
     }
-    agentNotes?: string                         // агент может редактировать/добавлять заметки
+
+    agentNotes?: string
 }
 
-const ClaimSchema = new mongoose.Schema<IClaim>({
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    program: { type: mongoose.Schema.Types.ObjectId, ref: 'Program', required: true },
-    propertyData: { type: mongoose.Schema.Types.Mixed, required: true },
-    startDate: { type: String, required: true },
-    durationDays: { type: Number, required: true },
-    status: {
-        type: String,
-        enum: ['pending','approved','rejected','evaluated','priced','closed'],
-        default: 'pending'
-    },
-    evaluation: {
-        value: Number,
-        evaluator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-        date: String
-    },
-    premium: {
-        amount: Number,
-        actuary: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-        date: String
-    },
-    agentNotes: String
-}, { timestamps: true })
+// 👇 Тип документа mongoose
+export interface IClaimDocument extends IClaim, Document {}
 
-export default mongoose.model('Claim', ClaimSchema)
+// Схема
+const ClaimSchema = new mongoose.Schema<IClaimDocument>(
+    {
+        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+
+        program: { type: mongoose.Schema.Types.ObjectId, ref: 'Program', required: true },
+
+        propertyData: {
+            type: mongoose.Schema.Types.Mixed,
+            required: true
+        },
+
+        startDate: { type: String, required: true },
+
+        durationDays: { type: Number, required: true },
+
+        status: {
+            type: String,
+            enum: ['pending','approved','rejected','evaluated','priced','closed'],
+            default: 'pending'
+        },
+
+        evaluation: {
+            value: Number,
+            evaluator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+            date: String
+        },
+
+        premium: {
+            amount: Number,
+            actuary: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+            date: String
+        },
+
+        agentNotes: String
+    },
+    { timestamps: true }
+)
+
+// 👇 Типизированная модель
+const Claim = mongoose.model<IClaimDocument>('Claim', ClaimSchema)
+
+export default Claim

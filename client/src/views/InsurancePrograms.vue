@@ -4,7 +4,7 @@
     <!-- Верхняя панель -->
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-2xl font-bold text-blue-600">
-        Страховые заявки
+        Создание программы страхования
       </h2>
 
       <button

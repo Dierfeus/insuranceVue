@@ -130,4 +130,31 @@ router.put('/:id/premium', authMiddleware, roleMiddleware('expert'), async (req:
     }
 })
 
+// --- Удаление заявки (только пользователь и только pending) ---
+router.delete('/:id', authMiddleware, roleMiddleware('user'), async (req: any, res) => {
+    try {
+        const claim = await Claim.findById(req.params.id)
+
+        if (!claim) {
+            return res.status(404).json({ message: 'Заявка не найдена' })
+        }
+
+        if (claim.user.toString() !== req.user.id) {
+            return res.status(403).json({ message: 'Нет доступа' })
+        }
+
+        // Проверка статуса
+        if (claim.status !== 'pending') {
+            return res.status(400).json({ message: 'Можно удалить только отправленную заявку' })
+        }
+
+        await claim.deleteOne()
+
+        res.json({ message: 'Заявка удалена' })
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ message: 'Server error' })
+    }
+})
+
 export default router
