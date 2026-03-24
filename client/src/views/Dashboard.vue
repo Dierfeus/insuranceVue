@@ -8,9 +8,7 @@
       <button v-if="role==='user'" :class="tab==='myClaims'?activeTabClass:tabClass" @click="tab='myClaims'">
         📑 Мои заявки
       </button>
-      <button v-if="role==='user'" :class="tab==='profile'?activeTabClass:tabClass" @click="tab='profile'">
-        👤 Профиль
-      </button>
+
 
 
 
@@ -49,11 +47,6 @@
       <!-- Мои заявки (пользователя) -->
       <div v-if="tab==='myClaims' && role==='user'">
         <UserClaims />
-      </div>
-
-      <!-- Профиль пользователя -->
-      <div v-if="tab==='profile' && role==='user'">
-        <UserProfile :userId="userId" />
       </div>
 
       <div v-if="tab==='clients' && role==='agent'">

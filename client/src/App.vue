@@ -35,11 +35,20 @@ const UserRole = computed((): string => {
         </div>
 
         <!-- Навигация и информация о пользователе -->
+        <!-- Навигация и информация о пользователе -->
         <div class="flex items-center gap-4 md:gap-6">
 
-          <span v-if="auth.token" class="text-gray-700 font-medium hidden sm:inline">
-            Роль: <span class="font-semibold text-blue-600">{{ UserRole }}</span>
-          </span>
+          <button
+              v-if="auth.token"
+              @click="router.push('/profile')"
+              class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition-all flex items-center gap-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M5.121 17.804A9 9 0 1118.364 4.56a9 9 0 01-13.243 13.243zM15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            Профиль
+          </button>
 
           <button
               v-if="auth.token"
@@ -47,7 +56,8 @@ const UserRole = computed((): string => {
               class="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600 transition-all flex items-center gap-2"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-10V5"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-10V5"/>
             </svg>
             Выйти
           </button>

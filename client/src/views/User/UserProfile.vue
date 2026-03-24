@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import axios from 'axios'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const user = ref<any>(null)
 const editMode = ref(false)
@@ -67,6 +70,13 @@ const saveProfile = async () => {
   <div class="max-w-xl mx-auto bg-white shadow rounded-2xl p-8">
     <h2 class="text-xl font-bold mb-6 text-blue-600 flex justify-between items-center">
       Мой профиль
+
+      <button
+          @click="router.push('/dashboard')"
+          class="text-sm bg-gray-200 px-3 py-1 rounded-lg hover:bg-gray-300 transition"
+      >
+        ← Назад
+      </button>
     </h2>
 
     <div v-if="user" class="space-y-4">
