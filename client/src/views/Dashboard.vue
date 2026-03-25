@@ -71,10 +71,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import UserProfile from './User/UserProfile.vue'
 import UserClaims from './User/UserClaims.vue'
 import AgentClients from "./Agent/AgentClients.vue";
-import AgentClaims from './Agent/AgentClaims.vue';
 import Contracts from "./Agent/Contracts.vue";
 import InsuranceProgram from "./InsurancePrograms.vue";
 

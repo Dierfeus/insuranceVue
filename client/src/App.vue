@@ -69,7 +69,7 @@ const UserRole = computed((): string => {
 
     <!-- Основной контент -->
     <main class="flex-1 p-6 max-w-6xl mx-auto w-full">
-      <router-view />
+      <router-view/>
     </main>
 
   </div>
