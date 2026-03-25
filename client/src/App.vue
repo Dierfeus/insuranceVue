@@ -39,7 +39,7 @@ const UserRole = computed((): string => {
         <div class="flex items-center gap-4 md:gap-6">
 
           <button
-              v-if="auth.token"
+              v-if="auth.token && auth.role === 'user'"
               @click="router.push('/profile')"
               class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition-all flex items-center gap-2"
           >

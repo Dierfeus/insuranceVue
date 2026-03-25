@@ -15,7 +15,7 @@ const routes = [
     { path: '/register', component: Register },
     { path: '/dashboard', name: 'Dashboard', component: DashboardPage, meta: { roles: ['agent', 'inspector', 'expert'] } },
     { path: '/:pathMatch(.*)*', component: NotFoundPage },
-    { path: '/profile', component: Profile, mets: { roles: ['user'] } },
+    { path: '/profile', component: Profile, meta: { roles: ['user'] } },
 ]
 
 const router = createRouter({

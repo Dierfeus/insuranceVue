@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import axios from 'axios'
+import { auth } from '../../store/auth'
 
 const token = localStorage.getItem('token')
 
 const showCreateClaim = ref(false)
 const programs = ref<any[]>([])
+const role = auth.role
 
 const today = new Date()
 const minStartDate = today.toISOString().split('T')[0]
@@ -80,7 +82,13 @@ const submitClaim = async () => {
 
 }
 
-onMounted(loadPrograms)
+onMounted(async () => {
+  await loadPrograms()
+
+  if (['agent', 'inspector', 'expert'].includes(role.value)) {
+    await loadAllClaims()
+  }
+})
 </script>
 
 
@@ -103,6 +111,21 @@ onMounted(loadPrograms)
         {{ showCreateClaim ? 'Скрыть форму' : '+ Новая заявка' }}
       </button>
 
+    </div>
+
+    <div v-if="claims.length" class="mt-6">
+      <h3 class="text-xl font-bold mb-4">Все заявки</h3>
+
+      <div
+          v-for="claim in claims"
+          :key="claim._id"
+          class="bg-white shadow rounded-xl p-4 mb-4 border"
+      >
+        <p><strong>Программа:</strong> {{ claim.program }}</p>
+        <p><strong>Клиент:</strong> {{ claim.user }}</p>
+        <p><strong>Статус:</strong> {{ claim.status }}</p>
+        <p><strong>Дата:</strong> {{ claim.startDate }}</p>
+      </div>
     </div>
 
 

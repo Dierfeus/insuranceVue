@@ -58,7 +58,7 @@
       </div>
 
       <div v-if="tab==='claims' && (role==='agent' || role==='expert')">
-        <AgentClaims />
+        <UserClaims />
       </div>
 
       <div v-if="tab==='programs' && role==='expert'">

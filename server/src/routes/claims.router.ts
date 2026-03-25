@@ -2,22 +2,44 @@ import { Router } from 'express'
 import Claim from '../models/Claim.ts'
 import { authMiddleware } from '../middleware/auth-middleware.ts'
 import { roleMiddleware } from '../middleware/role.middleware.ts'
+import User from '../models/User.ts'
 
 
 const router = Router()
+
+
 
 // --- Создание заявки ---
 // Пользователь создаёт только на себя, агент – на любого
 router.post('/', authMiddleware, async (req: any, res) => {
     try {
-        const { userId, program, propertyData, startDate, durationDays } = req.body
-        // Пользователь создаёт только на себя
-        if (req.user.role === 'user' && userId && userId !== req.user.id) {
-            return res.status(403).json({ message: 'Пользователь может создать заявку только на себя' })
+        const { userId, phone, program, propertyData, startDate, durationDays } = req.body
+
+        let targetUserId = req.user.id
+
+        // если агент
+        if (req.user.role === 'agent') {
+
+            if (phone) {
+                const user = await User.findOne({ phone })
+
+                if (!user) {
+                    return res.status(404).json({ message: 'Клиент не найден' })
+                }
+
+                targetUserId = user._id
+            } else if (userId) {
+                targetUserId = userId
+            }
+        }
+
+        // пользователь может только себе
+        if (req.user.role === 'user') {
+            targetUserId = req.user.id
         }
 
         const claim = await Claim.create({
-            user: req.user.role === 'agent' ? userId || req.user.id : req.user.id,
+            user: targetUserId,
             program,
             propertyData,
             startDate,
@@ -26,6 +48,7 @@ router.post('/', authMiddleware, async (req: any, res) => {
         })
 
         res.json(claim)
+
     } catch (err) {
         console.error(err)
         res.status(500).json({ message: 'Server error' })
@@ -35,7 +58,9 @@ router.post('/', authMiddleware, async (req: any, res) => {
 // --- Просмотр своих заявок (только user) ---
 router.get('/my', authMiddleware, roleMiddleware('user'), async (req: any, res) => {
     try {
-        const claims = await Claim.find({ user: req.user.id }).sort({ createdAt: -1 })
+        const claims = await Claim.find({ user: req.user.id })
+            .populate('program', 'name')
+            .sort({ createdAt: -1 })
         res.json(claims)
     } catch {
         res.status(500).json({ message: 'Server error' })
