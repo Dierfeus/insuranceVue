@@ -15,6 +15,16 @@ router.get('/', authMiddleware, roleMiddleware('agent'), async (req, res) => {
     }
 })
 
+// --- Обновить данные своего аккаунта (любой авторизованный пользователь) ---
+router.put('/me', authMiddleware, async (req: any, res) => {
+    try {
+        const updated = await User.findByIdAndUpdate(req.user.id, req.body, { new: true }).select('-password')
+        res.json(updated)
+    } catch {
+        res.status(500).json({ message: 'Server error' })
+    }
+})
+
 // --- Обновить клиента (только агент) ---
 router.put('/:id', authMiddleware, roleMiddleware('agent'), async (req, res) => {
     try {
@@ -40,14 +50,6 @@ router.get('/me', authMiddleware, async (req: any, res) => {
     }
 })
 
-// --- Обновить данные своего аккаунта (любой авторизованный пользователь) ---
-router.put('/me', authMiddleware, async (req: any, res) => {
-    try {
-        const updated = await User.findByIdAndUpdate(req.user.id, req.body, { new: true }).select('-password')
-        res.json(updated)
-    } catch {
-        res.status(500).json({ message: 'Server error' })
-    }
-})
+
 
 export default router

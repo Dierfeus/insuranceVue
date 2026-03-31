@@ -32,33 +32,25 @@ const form = reactive({
 
 const loadPrograms = async () => {
   try {
-
     const res = await axios.get(
         'http://localhost:5000/api/programs',
         { headers:{ Authorization:`Bearer ${token}` }}
     )
-
     programs.value = res.data
-
   } catch (err) {
-
     console.error('Ошибка загрузки программ')
-
   }
 }
 
 const submitClaim = async () => {
 
   try {
-
     await axios.post(
         'http://localhost:5000/api/claims',
         form,
         { headers:{ Authorization:`Bearer ${token}` }}
     )
-
     alert('Заявка создана')
-
     Object.assign(form,{
       lastName:'',
       firstName:'',
@@ -71,20 +63,14 @@ const submitClaim = async () => {
       durationDays:7,
       startDate:''
     })
-
     showCreateClaim.value=false
-
   } catch(err){
-
     alert('Ошибка создания заявки')
-
   }
-
 }
 
 onMounted(async () => {
   await loadPrograms()
-
   if (['agent', 'inspector', 'expert'].includes(role.value)) {
     await loadAllClaims()
   }
@@ -95,9 +81,6 @@ onMounted(async () => {
 <template>
 
   <div v-if="role==='agent'" class="max-w-5xl mx-auto bg-white shadow rounded-2xl p-6">
-
-    <!-- Верхняя панель -->
-
     <div  class="flex justify-between items-center mb-6">
 
       <h2 class="text-2xl font-bold text-blue-600">

@@ -16,7 +16,7 @@ const token = localStorage.getItem('token')
 const errors = reactive({
   phone: '',
   program: '',
-  startDate: ''
+  startDate: ""
 })
 
 const today = new Date()
