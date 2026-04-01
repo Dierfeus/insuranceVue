@@ -30,7 +30,6 @@ export interface IClaim {
     agentNotes?: string
 }
 
-// 👇 Тип документа mongoose
 export interface IClaimDocument extends IClaim, Document {}
 
 // Схема
@@ -72,7 +71,6 @@ const ClaimSchema = new mongoose.Schema<IClaimDocument>(
     { timestamps: true }
 )
 
-// 👇 Типизированная модель
 const Claim = mongoose.model<IClaimDocument>('Claim', ClaimSchema)
 
 export default Claim

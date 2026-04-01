@@ -13,7 +13,7 @@
 
 
       <!-- Агент -->
-      <button v-if="role==='agent' || role==='expert'"
+      <button v-if="role==='agent' || role==='expert' || role==='inspector'"
               :class="tab==='claims'?activeTabClass:tabClass"
               @click="tab='claims'">
         📑 Заявки
@@ -21,7 +21,7 @@
       <button v-if="role==='agent'" :class="tab==='contracts'?activeTabClass:tabClass" @click="tab='contracts'">
         📑 Договоры
       </button>
-      <button v-if="role==='agent'" :class="tab==='clients'?activeTabClass:tabClass" @click="tab='clients'">
+      <button v-if="role==='agent' || role==='expert' || role==='inspector'" :class="tab==='clients'?activeTabClass:tabClass" @click="tab='clients'">
         👥 Клиенты
       </button>
 
@@ -49,7 +49,7 @@
         <UserClaims />
       </div>
 
-      <div v-if="tab==='clients' && role==='agent'">
+      <div v-if="tab==='clients' && (role==='agent' || role==='expert' || role==='inspector')"  >
         <AgentClients />
       </div>
 
@@ -57,12 +57,16 @@
         <Contracts />
       </div>
 
-      <div v-if="tab==='claims' && (role==='agent' || role==='expert')">
+      <div v-if="tab==='claims' && (role==='agent' || role==='expert' || role==='inspector')">
         <UserClaims />
       </div>
 
       <div v-if="tab==='programs' && role==='expert'">
         <InsuranceProgram />
+      </div>
+
+      <div v-if="tab==='property' && role==='inspector'">
+        <Property />
       </div>
 
     </div>
@@ -75,6 +79,7 @@ import UserClaims from './User/UserClaims.vue'
 import AgentClients from "./Agent/AgentClients.vue";
 import Contracts from "./Agent/Contracts.vue";
 import InsuranceProgram from "./InsurancePrograms.vue";
+import Property from "./Property.vue"
 
 
 const role = ref<string|null>(null)
