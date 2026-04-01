@@ -5,8 +5,8 @@ import { roleMiddleware } from '../middleware/role.middleware.ts'
 
 const router = Router()
 
-// --- Получить всех клиентов (только агент) ---
-router.get('/', authMiddleware, roleMiddleware('agent'), async (req, res) => {
+// --- Получить всех клиентов (только работник) ---
+router.get('/', authMiddleware, roleMiddleware(['agent', 'inspector', 'expert']), async (req, res) => {
     try {
         const users = await User.find({ role: 'user' }, '-password')
         res.json(users)

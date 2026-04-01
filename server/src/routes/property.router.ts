@@ -45,25 +45,28 @@ router.delete('/:id', authMiddleware, roleMiddleware('inspector'), async (req: a
     }
 })
 
-// --- Просмотр имущества для пользователя (своё) и агента (по договорам) ---
-router.get('/', authMiddleware, async (req: any, res) => {
+// --- Просмотр имущества (inspector) ---
+router.get('/', authMiddleware, roleMiddleware(['inspector', 'agent']), async (req: any, res) => {
     try {
-        let properties
-
-        if (req.user.role === 'user') {
-            // Пользователь видит только своё имущество
-            properties = await Property.find({ client: req.user.id }).sort({ createdAt: -1 })
-        } else if (req.user.role === 'agent') {
-            // Агент видит имущество, которое включено в его договора
-            const contracts = await Contract.find({ agent: req.user.id }).select('properties')
-            const propertyIds = contracts.flatMap(c => (c as any).properties || [])
-            properties = await Property.find({ _id: { $in: propertyIds } }).sort({ createdAt: -1 })
-        } else {
-            return res.status(403).json({ message: 'Access denied' })
+        const { role } = req.user;
+        if (role === 'inspector' || role === 'agent') {
+            const properties = await Property.find()
+                .sort({ createdAt: -1 })
+                .populate('client', 'name email'); // Подтягиваем данные клиента
+            return res.json(properties);
         }
+    } catch (err) {
+        res.status(500).json({ message: 'Ошибка сервера' });
+    }
+});
 
+// --- Получение только СВОЕГО имущества (для обычного пользователя) ---
+router.get('/me', authMiddleware, async (req: any, res) => {
+    try {
+        // Здесь фильтрация строго по ID из токена
+        const properties = await Property.find({ client: req.user.id }).sort({ createdAt: -1 })
         res.json(properties)
-    } catch {
+    } catch (err) {
         res.status(500).json({ message: 'Server error' })
     }
 })

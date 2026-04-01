@@ -16,12 +16,14 @@ const fetchData = async () => {
   try {
     const headers = { Authorization: `Bearer ${token}` }
     // Загружаем уже оцененное имущество
-    const resProp = await axios.get('http://localhost:5000/api/property', { headers })
+    const resProp = await axios.get('http://localhost:5000/api/property',
+    { headers:{ Authorization:`Bearer ${token}` }} )
     properties.value = resProp.data
 
     // Загружаем заявки, которые нужно оценить (статус 'pending' или 'approved')
     // Примечание: эндпоинт /api/claims должен быть настроен на бэкенде
-    const resClaims = await axios.get('http://localhost:5000/api/claims', { headers })
+    const resClaims = await axios.get('http://localhost:5000/api/claims',
+      { headers:{ Authorization:`Bearer ${token}` }} )
     claims.value = resClaims.data
   } catch (err) {
     console.error('Ошибка загрузки данных', err)
@@ -75,10 +77,9 @@ onMounted(fetchData)
         <div v-for="claim in claims" :key="claim._id" class="border rounded-xl p-4 bg-blue-50/50 border-blue-100 shadow-sm">
           <div class="flex justify-between items-start">
             <div>
-              <p class="font-bold text-gray-700">Заявка #{{ claim._id.slice(-6) }}</p>
-              <p class="text-sm text-gray-600">Клиент ID: {{ claim.user }}</p>
+              <p class="font-bold text-gray-700">Заявка №{{ claim._id.slice(-6) }}</p>
               <div class="mt-2 p-2 bg-white rounded border text-sm">
-                <strong>Данные клиента:</strong> 
+                <strong>Имущество:</strong> 
                 {{ claim.propertyData.address || claim.propertyData.carModel }}
               </div>
             </div>
@@ -122,10 +123,11 @@ onMounted(fetchData)
       <div class="grid gap-4">
         <div v-for="item in properties" :key="item._id" class="bg-white shadow-sm border border-gray-100 p-6 rounded-xl flex justify-between items-center">
           <div>
-            <p class="text-sm text-gray-500 mb-1">Клиент: {{ item.client }}</p>
+
             <p class="font-medium">{{ item.description }}</p>
           </div>
           <div class="text-right">
+            
             <p class="text-xl font-bold text-blue-600">{{ item.value.toLocaleString() }} ₽</p>
             <p class="text-xs text-gray-400 italic">Оценка зафиксирована</p>
           </div>
