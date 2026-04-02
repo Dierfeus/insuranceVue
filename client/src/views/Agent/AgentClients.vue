@@ -88,7 +88,15 @@ onMounted(loadClients)
 </script>
 
 <template>
-  <div class="max-w-6xl mx-auto">
+  <div class="container">
+    <div class="header">
+      <h2 class="main-title">Управление клиентами</h2>
+      <button 
+        @click="showCreateForm = !showCreateForm"
+        class="btn-primary">{{ showCreateForm ? 'Скрыть форму' : '+ Добавить клиента' }}
+      </button>
+    </div>
+
 
     <!-- Список клиентов -->
     <div v-for="client in clients" :key="client._id"
