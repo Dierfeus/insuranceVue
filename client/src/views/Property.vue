@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
 const properties = ref([])
-const claims = ref([]) // Список заявок от клиентов
+const claims = ref([])
 const loading = ref(false)
 const token = localStorage.getItem('token')
 
@@ -15,13 +15,9 @@ const evaluationDescription = ref('')
 const fetchData = async () => {
   try {
     const headers = { Authorization: `Bearer ${token}` }
-    // Загружаем уже оцененное имущество
     const resProp = await axios.get('http://localhost:5000/api/property',
     { headers:{ Authorization:`Bearer ${token}` }} )
     properties.value = resProp.data
-
-    // Загружаем заявки, которые нужно оценить (статус 'pending' или 'approved')
-    // Примечание: эндпоинт /api/claims должен быть настроен на бэкенде
     const resClaims = await axios.get('http://localhost:5000/api/claims',
       { headers:{ Authorization:`Bearer ${token}` }} )
     claims.value = resClaims.data
@@ -66,27 +62,28 @@ onMounted(fetchData)
 </script>
 
 <template>
-  <div class="max-w-6xl mx-auto p-4 space-y-8">
+  <div class="container">
     
-    <!-- СЕКЦИЯ 1: ЗАЯВКИ ОТ КЛИЕНТОВ (Ожидают оценки) -->
+    <!-- заявки -->
     <section>
-      <h2 class="text-2xl font-bold text-blue-600 mb-6">Новые заявки на оценку</h2>
-      <div v-if="claims.length === 0" class="text-gray-400 italic">Нет новых заявок</div>
+      <div class="header">
+        <h2 class="main-title">Новые заявки на оценку</h2>
+     </div>
+      <div v-if="claims.length === 0" class="form-title">Нет новых заявок</div>
       
-      <div class="grid gap-4 md:grid-cols-2">
-        <div v-for="claim in claims" :key="claim._id" class="border rounded-xl p-4 bg-blue-50/50 border-blue-100 shadow-sm">
-          <div class="flex justify-between items-start">
-            <div>
-              <p class="font-bold text-gray-700">Заявка №{{ claim._id.slice(-6) }}</p>
-              <div class="mt-2 p-2 bg-white rounded border text-sm">
-                <strong>Имущество:</strong> 
+      <div class="card-grid">
+        <div v-for="claim in claims" :key="claim._id" class="card">
+
+            <p class="badge-type">№{{ claim._id.slice(-6) }}</p>
+            
+            <div class="program-name">
                 {{ claim.propertyData.address || claim.propertyData.carModel }}
-              </div>
             </div>
+            <p class="program-desc">Имущество</p>
             <button @click="startEvaluation(claim)" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-blue-700">
               Оценить
             </button>
-          </div>
+
         </div>
       </div>
     </section>
@@ -119,8 +116,10 @@ onMounted(fetchData)
 
     <!-- СЕКЦИЯ 2: СПИСОК УЖЕ ОЦЕНЕННОГО -->
     <section>
-      <h2 class="text-2xl font-bold text-gray-800 mb-6">Архив оценок</h2>
-      <div class="grid gap-4">
+      <div class="header">
+        <h2 class="main-title">Архив оценок</h2>
+     </div>
+      <div class="card-grid">
         <div v-for="item in properties" :key="item._id" class="bg-white shadow-sm border border-gray-100 p-6 rounded-xl flex justify-between items-center">
           <div>
 

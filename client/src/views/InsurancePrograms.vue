@@ -4,23 +4,27 @@
       <h2 class="main-title">Управление программами</h2>
       <button 
         @click="showCreateForm = !showCreateForm"
-        class="btn-primary">{{ showCreateForm ? 'Скрыть форму' : '+ Новая программа' }}
+        class="btn-primary">
+        {{ showCreateForm ? 'Скрыть форму' : '+ Новая программа' }}
       </button>
     </div>
 
     <div v-if="showCreateForm" class="creation-form-container">
-      <h3 class="form-title">Параметры новой программы</h3>
-      
-      <form @submit.prevent="submitProgram" class="space-y-4">
-        <div class="grid md:grid-cols-2 gap-4">
-          <!-- Название -->
-          <div class="md:col-span-2">
+      <h3 class="form-title">Параметры новой программы</h3> 
+      <form @submit.prevent="submitProgram" class="form-body">
+        <div class="form-grid">
+          <div class="form-group full-width">
             <label class="form-label">Название программы</label>
-            <input v-model="newProgram.name" type="text" class="form-input" placeholder="Например: КАСКО Премиум" required />
+            <input 
+              v-model="newProgram.name"
+              type="text"
+              class="form-input"
+              placeholder="Например: КАСКО Премиум"
+              required
+            />
           </div>
 
-          <!-- Тип -->
-          <div>
+          <div class="form-group">
             <label class="form-label">Тип объекта</label>
             <select v-model="newProgram.type" class="form-select" required>
               <option value="home">Дом</option>
@@ -30,58 +34,86 @@
             </select>
           </div>
 
-          <!-- Срок -->
-          <div>
-            <label class="form-label">Рекомендуемый срок (дней)</label>
-            <input v-model.number="newProgram.durationDays" type="number" min="1" class="form-input" required />
+          <div class="form-group">
+            <label class="form-label">Срок (дней)</label>
+            <input 
+              v-model.number="newProgram.durationDays"
+              type="number"
+              min="1"
+              class="form-input"
+              required
+            />
           </div>
 
-          <!-- Страховая сумма -->
-          <div>
-            <label class="form-label">Страховое покрытие (₽)</label>
-            <input v-model.number="newProgram.coverage" type="number" min="0" class="form-input" placeholder="Сумма выплаты" required />
+          <div class="form-group">
+            <label class="form-label">Покрытие (₽)</label>
+            <input 
+              v-model.number="newProgram.coverage"
+              type="number"
+              class="form-input"
+              required
+            />
           </div>
 
-          <!-- Цена -->
-          <div>
-            <label class="form-label">Стоимость полиса (₽)</label>
-            <input v-model.number="newProgram.price" type="number" min="0" class="form-input" placeholder="Цена для клиента" required />
+          <div class="form-group">
+            <label class="form-label">Цена (₽)</label>
+            <input 
+              v-model.number="newProgram.price"
+              type="number"
+              class="form-input text-highlight"
+              required
+            />
           </div>
+
         </div>
 
-        <!-- Описание -->
-        <div>
+        <div class="form-group">
           <label class="form-label">Описание условий</label>
-          <textarea v-model="newProgram.description" rows="3" class="form-textarea" placeholder="Подробности страхового случая..." required></textarea>
+          <textarea 
+            v-model="newProgram.description"
+            rows="3"
+            class="form-textarea"
+            required
+          ></textarea>
         </div>
 
-        <button type="submit" :disabled="loading" class="btn-primary btn-submit">
-          {{ loading ? 'Сохранение...' : 'Опубликовать программу' }}
-        </button>
+        <div class="form-actions">
+          <button type="submit" :disabled="loading" class="btn-primary btn-submit">
+            {{ loading ? 'Сохранение...' : 'Опубликовать программу' }}
+          </button>
+        </div>
+
       </form>
     </div>
 
-    <!-- Список существующих программ -->
-    <h3 class="text-lg font-semibold mb-4">Действующие программы</h3>
+    <div class="section-container">
+      <div class="header">
+        <h3 class="main-title">Действующие программы</h3>
+      </div>
 
-    <div v-if="!programs || programs.length === 0" class="form-title">Список программ пуст.</div>
+      <div v-if="!programs || programs.length === 0" class="empty-text">
+        Список программ пуст
+      </div>
 
-    <div class="card-grid">
-  <div v-for="prog in programs" :key="prog._id" class="card">
-    <div class="program-footer">
-      <span class="badge-type">
-        {{ prog.type }}
-      </span>
-      <span class="program-price"> {{ (prog.price || 0) }} ₽ </span>
+      <div class="card-grid">
+        <div v-for="prog in programs" :key="prog._id" class="card">
+
+          <div class="program-footer">
+            <span class="badge-type">{{ prog.type }}</span>
+            <span class="program-price">{{ prog.price }} ₽</span>
+          </div>
+
+          <h4 class="program-name">{{ prog.name }}</h4>
+          <p class="program-desc">{{ prog.description }}</p>
+
+          <div class="program-footer">
+            <span>Покрытие: <strong>{{ prog.coverage }} ₽</strong></span>
+            <span>Срок: <strong>{{ prog.durationDays }} дн.</strong></span>
+          </div>
+
+        </div>
+      </div>
     </div>
-    <h4 class="program-name">{{ prog.name }}</h4>
-    <p class="program-desc">{{ prog.description }}</p>
-    <div class="program-footer">
-      <span>Покрытие: <strong>{{ prog.coverage || 0 }} ₽</strong></span>
-      <span>Срок: <strong>{{ prog.durationDays }} дн.</strong></span>
-    </div>
-  </div>
-</div>
 
   </div>
 </template>
