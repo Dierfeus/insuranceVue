@@ -18,7 +18,8 @@
               @click="tab='claims'">
         📑 Заявки
       </button>
-      <button v-if="role==='agent'" :class="tab==='contracts'?activeTabClass:tabClass" @click="tab='contracts'">
+      <button v-if="role==='agent'" 
+              :class="tab==='contracts'?activeTabClass:tabClass" @click="tab='contracts'">
         📑 Договоры
       </button>
       <button v-if="role==='agent' || role==='expert' || role==='inspector'" :class="tab==='clients'?activeTabClass:tabClass" @click="tab='clients'">
