@@ -12,7 +12,7 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     font-family: 'Inter', sans-serif;
   }
-  
+
   /* 2. Шапка и заголовок */
   .header {
     display: flex;
@@ -21,14 +21,14 @@
     margin-bottom: 24px;
     flex-wrap: wrap;
   }
-  
+
   .main-title {
     font-size: 1.5rem;
     font-weight: 800;
     color: #2563eb;
     margin: 0;
   }
-  
+
   /* 3. Кнопки */
   .btn-primary {
     background-color: #2563eb;
@@ -40,13 +40,13 @@
     cursor: pointer;
     transition: all 0.2s ease;
   }
-  
+
   .btn-primary:hover {
     background-color: #1d4ed8;
     box-shadow: 0 5px 7px -3px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
   }
-  
+
   .btn-submit {
     width: 100%;
     margin-top: 1rem;
@@ -58,7 +58,7 @@
     box-shadow: 0 5px 7px -3px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
   }
-  
+
   /* 4. Форма создания */
   .creation-form-container {
     background-color: #f8fafc;
@@ -68,7 +68,7 @@
     margin-bottom: 32px;
 
   }
-  
+
   .form-title {
     display: block;
     font-size: 1.25rem;
@@ -84,7 +84,7 @@
     color: #101011;
     margin-bottom: 4px;
   }
-  
+
   .form-input, .form-select, .form-textarea {
     width: 100%;
     padding: 10px;
@@ -93,19 +93,19 @@
     outline: none;
     transition: border-color 0.2s;
   }
-  
+
   .form-input:focus {
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
-  
+
   /* 5. Сетка и карточки программ */
   .card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
   }
-  
+
   .card {
     border: 1px solid #f1f5f9;
     background: #fff;
@@ -115,12 +115,12 @@
     display: flex;
     flex-direction: column;
   }
-  
+
   .card:hover {
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
   }
-  
+
   /* 6. Элементы внутри карточки */
   .badge-type {
     font-size: 10px;
@@ -131,27 +131,27 @@
     color: #2563eb;
     border-radius: 4px;
   }
-  
+
   .program-price {
     font-size: 1.125rem;
     font-weight: 700;
     color: #2563eb;
   }
-  
+
   .program-name {
     font-size: 1.1rem;
     font-weight: 700;
     margin: 12px 0 8px 0;
     color: #1e293b;
   }
-  
+
   .program-desc {
     font-size: 0.875rem;
     color: #64748b;
     line-height: 1.5;
     margin-bottom: 16px;
   }
-  
+
   .program-footer {
     margin-top: auto;
     padding-top: 12px;
@@ -161,19 +161,19 @@
     font-size: 0.75rem;
     color: #94a3b8;
   }
-  
+
   .footer-val {
     color: #475569;
     font-weight: 600;
   }
-  
+
   /* Стили для кнопок управления (Редактировать/Удалить) */
   .card-actions {
     display: flex;
     gap: 8px;
     margin-top: 12px;
   }
-  
+
   .btn-edit {
     font-size: 0.75rem;
     padding: 6px 12px;
@@ -181,4 +181,201 @@
     color: #475569;
     border-radius: 6px;
   }
-  
+
+/* === Общие стили для всех форм (вход/регистрация) === */
+.auth-page {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(to right, var(--primary), #6366f1); /* можно менять градиент через классы */
+    padding: 2rem;
+    width: 100%;
+}
+
+.auth-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    width: 100%;
+    max-width: 400px;
+    font-family: 'Inter', sans-serif;
+}
+
+.auth-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--primary);
+}
+
+.auth-input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.auth-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 12px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #fff;
+}
+
+.auth-btn-primary {
+    background-color: #2563eb;
+}
+
+.auth-btn-primary:hover {
+    background-color: #1d4ed8;
+    box-shadow: 0 5px 7px -3px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.auth-btn-success {
+    background-color: #16a34a;
+}
+
+.auth-btn-success:hover {
+    background-color: #15803d;
+    box-shadow: 0 5px 7px -3px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.auth-text-link {
+    text-align: center;
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+}
+
+.auth-text-link a {
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-text-link a:hover {
+    text-decoration: underline;
+}
+
+
+/* === Общие обертки === */
+.page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background-color: #f8fafc;
+}
+
+/* === Хедер === */
+.header {
+    width: 100%;
+    background-color: #ffffff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    transition: box-shadow 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 32px;
+}
+.header:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+
+/* Логотип */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    background-color: #2563eb;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.logo-text {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2563eb;
+}
+
+/* Навигация */
+.header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* Кнопки */
+.btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    color: #fff;
+    transition: all 0.2s ease;
+}
+.btn svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2;
+}
+
+/* Синие кнопки профиля */
+.btn-profile {
+    background-color: #3b82f6;
+}
+.btn-profile:hover {
+    background-color: #2563eb;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transform: translateY(-1px);
+}
+
+/* Красные кнопки выхода */
+.btn-logout {
+    background-color: #ef4444;
+}
+.btn-logout:hover {
+    background-color: #dc2626;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transform: translateY(-1px);
+}
+
+/* === Основной контент === */
+.main-content {
+    flex: 1;
+    padding: 24px 32px;
+    width: 100%;
+    box-sizing: border-box;
+}

@@ -2,20 +2,20 @@
   <div class="container">
     <div class="header">
       <h2 class="main-title">Управление программами</h2>
-      <button 
+      <button
         @click="showCreateForm = !showCreateForm"
-        class="btn-primary">
+        class="btn btn-primary" style="width:auto; padding:10px 16px;">
         {{ showCreateForm ? 'Скрыть форму' : '+ Новая программа' }}
       </button>
     </div>
 
-    <div v-if="showCreateForm" class="creation-form-container">
-      <h3 class="form-title">Параметры новой программы</h3> 
+    <div v-if="showCreateForm" class="card-block">
+      <h3 class="form-title">Параметры новой программы</h3>
       <form @submit.prevent="submitProgram" class="form-body">
         <div class="form-grid">
           <div class="form-group full-width">
             <label class="form-label">Название программы</label>
-            <input 
+            <input
               v-model="newProgram.name"
               type="text"
               class="form-input"
@@ -36,7 +36,7 @@
 
           <div class="form-group">
             <label class="form-label">Срок (дней)</label>
-            <input 
+            <input
               v-model.number="newProgram.durationDays"
               type="number"
               min="1"
@@ -47,7 +47,7 @@
 
           <div class="form-group">
             <label class="form-label">Покрытие (₽)</label>
-            <input 
+            <input
               v-model.number="newProgram.coverage"
               type="number"
               class="form-input"
@@ -57,7 +57,7 @@
 
           <div class="form-group">
             <label class="form-label">Цена (₽)</label>
-            <input 
+            <input
               v-model.number="newProgram.price"
               type="number"
               class="form-input text-highlight"
@@ -69,7 +69,7 @@
 
         <div class="form-group">
           <label class="form-label">Описание условий</label>
-          <textarea 
+          <textarea
             v-model="newProgram.description"
             rows="3"
             class="form-textarea"
@@ -77,8 +77,8 @@
           ></textarea>
         </div>
 
-        <div class="form-actions">
-          <button type="submit" :disabled="loading" class="btn-primary btn-submit">
+        <div style="display:flex; gap:10px; margin-top:16px;">
+          <button type="submit" :disabled="loading" class="btn btn-primary">
             {{ loading ? 'Сохранение...' : 'Опубликовать программу' }}
           </button>
         </div>

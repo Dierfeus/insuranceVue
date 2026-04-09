@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-100 to-blue-300 px-4">
-    <div class="bg-white rounded-2xl shadow-lg max-w-3xl w-full p-10 text-center">
+  <div class="auth-page" style="background: linear-gradient(to right, #bfdbfe, #93c5fd); min-height: 100vh;">
+    <div class="auth-card text-center max-w-3xl">
 
       <!-- Заголовок -->
-      <h1 class="text-4xl font-bold text-blue-600 mb-4">
+      <h1 class="auth-title" style="font-size: 2.5rem; color: #2563eb;">
         Добро пожаловать в компанию "SafeInsure"
       </h1>
 
@@ -16,14 +16,16 @@
       <div class="flex flex-col sm:flex-row justify-center gap-4">
         <router-link
             to="/login"
-            class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+            class="auth-btn auth-btn-primary"
+            style="width:auto; padding:12px 24px;"
         >
           Войти
         </router-link>
 
         <router-link
             to="/register"
-            class="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition"
+            class="auth-btn auth-btn-success"
+            style="width:auto; padding:12px 24px;"
         >
           Зарегистрироваться
         </router-link>

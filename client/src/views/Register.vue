@@ -1,28 +1,25 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-green-500 to-emerald-600">
-    <div class="bg-white p-8 rounded-2xl shadow-2xl w-96">
-      <h2 class="text-2xl font-bold mb-6 text-center">Регистрация</h2>
+  <div class="auth-page">
+    <div class="auth-card">
+      <h2 class="auth-title">Регистрация</h2>
 
-      <input v-model="lastName" placeholder="Фамилия" class="w-full p-3 mb-3 border rounded-lg"/>
-      <input v-model="firstName" placeholder="Имя" class="w-full p-3 mb-3 border rounded-lg"/>
-      <input v-model="middleName" placeholder="Отчество" class="w-full p-3 mb-3 border rounded-lg"/>
+      <input v-model="lastName" placeholder="Фамилия" class="auth-input"/>
+      <input v-model="firstName" placeholder="Имя" class="auth-input"/>
+      <input v-model="middleName" placeholder="Отчество" class="auth-input"/>
 
-      <input v-model="phone" placeholder="Номер телефона" class="w-full p-3 mb-3 border rounded-lg"/>
-      <input v-model="email" type="email" placeholder="Email" class="w-full p-3 mb-3 border rounded-lg"/>
-      <input v-model="birthDate" type="date" class="w-full p-3 mb-3 border rounded-lg"/>
+      <input v-model="phone" placeholder="Номер телефона" class="auth-input"/>
+      <input v-model="email" type="email" placeholder="Email" class="auth-input"/>
+      <input v-model="birthDate" type="date" class="auth-input"/>
 
-      <input v-model="username" placeholder="Логин" class="w-full p-3 mb-3 border rounded-lg"/>
-      <input v-model="password" type="password" placeholder="Пароль" class="w-full p-3 mb-3 border rounded-lg"/>
+      <input v-model="username" placeholder="Логин" class="auth-input"/>
+      <input v-model="password" type="password" placeholder="Пароль" class="auth-input"/>
 
-      <button
-          @click="register"
-          class="w-full bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition">
+      <button @click="register" class="auth-btn auth-btn-success">
         Зарегистрироваться
       </button>
 
-      <p class="mt-3 text-sm text-center">
-        Есть аккаунт?
-        <router-link to="/" class="text-blue-500">Войти</router-link>
+      <p class="auth-text-link">
+        Есть аккаунт? <router-link to="/login">Войти</router-link>
       </p>
     </div>
   </div>

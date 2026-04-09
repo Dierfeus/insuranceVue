@@ -1,15 +1,20 @@
 <template>
-    <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 to-indigo-600">
-<div class="bg-white p-8 rounded-2xl shadow-2xl w-96">
-<h2 class="text-2xl font-bold mb-6 text-center">Вход</h2>
-    <input v-model="username" placeholder="Логин" class="w-full p-3 mb-3 border rounded-lg"/>
-<input v-model="password" type="password" placeholder="Пароль" class="w-full p-3 mb-3 border rounded-lg"/>
-<button @click="login" class="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition">
-    Войти
-    </button>
-    <p class="mt-3 text-sm text-center">Нет аккаунта? <router-link to="/register" class="text-blue-500">Регистрация</router-link></p>
-</div>
-</div>
+  <div class="auth-page">
+    <div class="auth-card">
+      <h2 class="auth-title">Вход</h2>
+
+      <input v-model="username" placeholder="Логин" class="auth-input"/>
+      <input v-model="password" type="password" placeholder="Пароль" class="auth-input"/>
+
+      <button @click="login" class="auth-btn auth-btn-primary">
+        Войти
+      </button>
+
+      <p class="auth-text-link">
+        Нет аккаунта? <router-link to="/register">Регистрация</router-link>
+      </p>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
