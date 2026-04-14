@@ -65,7 +65,7 @@ onMounted(fetchData)
   <div class="container">
     
     <!-- заявки -->
-    <section>
+    <section v-if="role==='inspector'">
       <div class="header">
         <h2 class="main-title">Новые заявки на оценку</h2>
      </div>
