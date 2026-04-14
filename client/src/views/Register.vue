@@ -29,6 +29,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { auth } from '../store/auth'
+import { showError } from '../store/errorModal'
 
 const firstName = ref('')
 const lastName = ref('')
@@ -59,7 +60,7 @@ const register = async () => {
     alert('Аккаунт создан!')
     router.push('/')
   } catch (e) {
-    alert('Ошибка регистрации')
+    showError('Ошибка регистрации')
   }
 }
 </script>
