@@ -48,17 +48,17 @@ router.delete('/:id', authMiddleware, roleMiddleware('inspector'), async (req: a
 // --- Просмотр имущества (inspector) ---
 router.get('/', authMiddleware, roleMiddleware(['inspector', 'agent']), async (req: any, res) => {
     try {
-        const { role } = req.user;
-        if (role === 'inspector' || role === 'agent') {
-            const properties = await Property.find()
-                .sort({ createdAt: -1 })
-                .populate('client', 'name email'); // Подтягиваем данные клиента
-            return res.json(properties);
-        }
-    } catch (err) {
-        res.status(500).json({ message: 'Ошибка сервера' });
+        const { client } = req.query
+
+        let filter = {}
+        if (client) filter = { client }
+
+        const properties = await Property.find(filter)
+        res.json(properties)
+    } catch {
+        res.status(500).json({ message: 'Ошибка сервера' })
     }
-});
+})
 
 // --- Получение только СВОЕГО имущества (для обычного пользователя) ---
 router.get('/me', authMiddleware, async (req: any, res) => {
