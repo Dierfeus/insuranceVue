@@ -3,6 +3,7 @@ import { auth } from './store/auth'
 import { useRouter } from 'vue-router'
 import { RolesEnum } from './type/RolesEnum.ts'
 import { computed } from 'vue'
+import { ref } from 'vue'
 
 const router = useRouter()
 
@@ -17,6 +18,23 @@ const UserRole = computed((): string => {
   const role = auth.role as keyof typeof RolesEnum
   return RolesEnum[role]
 })
+
+const showError = ref(false)
+const errorMessage = ref('')
+
+const openError = (msg: string) => {
+  errorMessage.value = msg
+  showError.value = true
+}
+
+const closeError = () => {
+      showError.value = false
+      errorMessage.value = ''
+    }
+
+// 👇 экспорт через window (быстро и просто для проекта)
+;(window as any).$error = openError
+
 </script>
 
 <template>
@@ -34,18 +52,10 @@ const UserRole = computed((): string => {
         <!-- Кнопки справа -->
         <div class="header-actions">
           <button v-if="auth.token && auth.role === 'user'" @click="router.push('/profile')" class="btn btn-profile">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M5.121 17.804A9 9 0 1118.364 4.56a9 9 0 01-13.243 13.243zM15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
             Профиль
           </button>
 
           <button v-if="auth.token" @click="logout" class="btn btn-logout">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-10V5"/>
-            </svg>
             Выйти
           </button>
         </div>
@@ -57,5 +67,28 @@ const UserRole = computed((): string => {
       <router-view/>
     </main>
 
+  </div>
+
+
+  <!-- общее -->
+  <div v-if="showError" class="modal-overlay">
+    <div class="modal-window error-modal">
+
+      <div class="modal-header">
+        <h3>Ошибка</h3>
+        <button @click="closeError">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="error-text">
+          {{ errorMessage }}
+        </p>
+
+        <button class="btn-primary btn-submit" @click="closeError">
+          Понятно
+        </button>
+      </div>
+
+    </div>
   </div>
 </template>

@@ -373,3 +373,15 @@
     width: 100%;
     box-sizing: border-box;
 }
+
+/* Ошибка модалка */
+.error-modal {
+    border: 1px solid #fecaca;
+}
+
+.error-text {
+    color: #dc2626;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px 0;
+}
