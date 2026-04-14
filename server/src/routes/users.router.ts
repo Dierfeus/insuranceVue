@@ -49,6 +49,22 @@ router.get('/me', authMiddleware, async (req: any, res) => {
         res.status(500).json({ message: 'Server error' })
     }
 })
+// --- Удалить клиента (только agent) ---
+router.delete('/:id', authMiddleware, roleMiddleware('agent'), async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id)
+
+        if (!user || user.role !== 'user') {
+            return res.status(404).json({ message: 'User not found' })
+        }
+
+        await user.deleteOne()
+
+        res.json({ message: 'User deleted' })
+    } catch {
+        res.status(500).json({ message: 'Server error' })
+    }
+})
 
 
 
