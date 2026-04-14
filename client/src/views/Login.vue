@@ -21,6 +21,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { auth } from '../store/auth'
+import { showError } from '../store/errorModal'
 
 const username = ref('')
 const password = ref('')
@@ -31,7 +32,7 @@ const login = async () => {
         await auth.login(username.value, password.value)
         router.push('/dashboard')
     } catch (err) {
-        alert('Ошибка входа')
+      showError('Ошибка входа')
     }
 }
 </script>
