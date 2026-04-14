@@ -29,7 +29,7 @@
 
 
       <!-- Оценщик -->
-      <button v-if="role==='inspector'" :class="tab==='property'?activeTabClass:tabClass" @click="tab='property'">
+      <button v-if="role==='inspector' || role==='agent'" :class="tab==='property'?activeTabClass:tabClass" @click="tab='property'">
         🏠 Оценка имущества
       </button>
 
@@ -66,7 +66,7 @@
         <InsuranceProgram />
       </div>
 
-      <div v-if="tab==='property' && role==='inspector'">
+      <div v-if="tab==='property' && (role==='inspector' || role==='agent')" >
         <Property />
       </div>
 
