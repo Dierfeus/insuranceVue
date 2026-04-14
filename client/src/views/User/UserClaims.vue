@@ -182,52 +182,45 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto bg-white shadow rounded-2xl p-6">
+  <div class="container">
 
-    <!-- Заголовок -->
-    <div class="flex justify-between mb-6">
-      <h2 class="text-2xl font-bold text-blue-600">
-        Страховые заявки
-      </h2>
+    <!-- HEADER -->
+    <div class="header">
+      <h2 class="main-title">Страховые заявки</h2>
 
       <button
           v-if="['user','agent'].includes(role)"
           @click="showCreateClaim = !showCreateClaim"
-          class="bg-blue-600 text-white px-4 py-2 rounded-lg"
+          class="btn-primary"
+          style="width:auto"
       >
         {{ showCreateClaim ? 'Скрыть' : '+ Новая заявка' }}
       </button>
     </div>
 
-    <!-- Форма -->
-    <div v-if="showCreateClaim" class="bg-gray-50 p-4 rounded-lg mb-6">
+    <!-- ФОРМА -->
+    <div v-if="showCreateClaim" class="creation-form-container">
+      <span class="form-title">Создание заявки</span>
 
-      <form @submit.prevent="submitClaim" class="space-y-4">
+      <form @submit.prevent="submitClaim">
 
         <!-- телефон -->
-        <div v-if="role === 'agent'">
-          <label class="font-semibold">Номер телефона клиента</label>
-
+        <div v-if="role === 'agent'" class="form-group">
+          <label class="form-label">Телефон клиента</label>
           <input
               v-model="newClaim.phone"
-              class="w-full border p-2 rounded-lg"
-              :class="{ 'border-red-500': errors.phone }"
+              class="form-input"
           />
-
           <p v-if="errors.phone" class="text-red-500 text-sm">
             {{ errors.phone }}
           </p>
         </div>
 
         <!-- программа -->
-        <div>
-          <label class="font-semibold">Программа</label>
+        <div class="form-group">
+          <label class="form-label">Программа</label>
 
-          <select
-              v-model="newClaim.programId"
-              class="w-full border p-2 rounded-lg"
-              :class="{ 'border-red-500': errors.program }"
-          >
+          <select v-model="newClaim.programId" class="form-select">
             <option value="">Выберите программу</option>
             <option v-for="p in programs" :key="p._id" :value="p._id">
               {{ p.name }}
@@ -240,33 +233,32 @@ onMounted(async () => {
         </div>
 
         <!-- дом -->
-        <div v-if="selectedProgramType === 'home'">
-          <label class="font-semibold">Адрес</label>
-          <input v-model="newClaim.propertyData.address" class="w-full border p-2 rounded-lg"/>
+        <div v-if="selectedProgramType === 'home'" class="form-group">
+          <label class="form-label">Адрес</label>
+          <input v-model="newClaim.propertyData.address" class="form-input" />
         </div>
 
         <!-- авто -->
-        <div v-if="selectedProgramType === 'car'">
-          <label class="font-semibold">Модель авто</label>
-          <input v-model="newClaim.propertyData.carModel" class="w-full border p-2 rounded-lg"/>
+        <div v-if="selectedProgramType === 'car'" class="form-group">
+          <label class="form-label">Модель авто</label>
+          <input v-model="newClaim.propertyData.carModel" class="form-input" />
         </div>
 
         <!-- срок -->
-        <div>
-          <label class="font-semibold">Срок (дней)</label>
-          <input type="number" v-model.number="newClaim.durationDays" class="w-full border p-2 rounded-lg"/>
+        <div class="form-group">
+          <label class="form-label">Срок (дней)</label>
+          <input type="number" v-model.number="newClaim.durationDays" class="form-input"/>
         </div>
 
         <!-- дата -->
-        <div>
-          <label class="font-semibold">Дата начала</label>
+        <div class="form-group">
+          <label class="form-label">Дата начала</label>
 
           <input
               type="date"
               v-model="newClaim.startDate"
               :min="minStartDate"
-              class="w-full border p-2 rounded-lg"
-              :class="{ 'border-red-500': errors.startDate }"
+              class="form-input"
           />
 
           <p v-if="errors.startDate" class="text-red-500 text-sm">
@@ -274,41 +266,64 @@ onMounted(async () => {
           </p>
         </div>
 
-        <button class="w-full bg-green-600 text-white py-2 rounded-lg">
-          Создать
+        <button class="btn-primary btn-submit">
+          Создать заявку
         </button>
 
       </form>
     </div>
 
-    <!-- список -->
-    <div v-for="claim in claims" :key="claim._id" class="border p-4 mb-4 rounded-lg">
+    <!-- СПИСОК ЗАЯВОК -->
+    <div class="card-grid">
 
-      <p><b>Программа:</b> {{ claim.programName }}</p>
+      <div v-for="claim in claims" :key="claim._id" class="card">
 
-      <p v-if="role !== 'user'">
-        <b>Клиент:</b> {{ claim.userName }}
-      </p>
+        <span class="badge-type">
+          №{{ claim._id.slice(-6) }}
+        </span>
 
-      <p><b>Объект:</b> {{ claim.propertyInfo }}</p>
-      <p><b>Срок:</b> {{ claim.durationDays }}</p>
-      <p><b>Дата:</b> {{ formatDate(claim.startDate) }}</p>
-
-      <div class="flex justify-between mt-2">
-        <span>{{ getStatusText(claim.status) }}</span>
-
-        <button
-            v-if="role === 'user' && claim.status === 'pending'"
-            @click="deleteClaim(claim._id)"
-            class="text-red-500"
-        >
-          Удалить
-        </button>
-
-        <div v-if="role === 'agent'">
-          <button @click="changeStatus(claim._id,'approved')">✔</button>
-          <button @click="changeStatus(claim._id,'rejected')">✖</button>
+        <div class="program-name">
+          {{ claim.programName }}
         </div>
+
+        <div class="program-desc">
+          {{ claim.propertyInfo }}
+        </div>
+
+        <div class="program-footer">
+          <span>Срок: <b class="footer-val">{{ claim.durationDays }}</b></span>
+          <span>{{ formatDate(claim.startDate) }}</span>
+        </div>
+
+        <div class="program-footer">
+          <span class="footer-val">
+            {{ getStatusText(claim.status) }}
+          </span>
+        </div>
+
+        <!-- ДЕЙСТВИЯ -->
+        <div class="card-actions">
+
+          <button
+              v-if="role === 'user' && claim.status === 'pending'"
+              @click="deleteClaim(claim._id)"
+              class="btn-edit"
+              style="color:red"
+          >
+            Удалить
+          </button>
+
+          <template v-if="role === 'agent'">
+            <button @click="changeStatus(claim._id,'approved')" class="btn-edit">
+              ✔ Одобрить
+            </button>
+            <button @click="changeStatus(claim._id,'rejected')" class="btn-edit">
+              ✖ Отклонить
+            </button>
+          </template>
+
+        </div>
+
       </div>
 
     </div>
