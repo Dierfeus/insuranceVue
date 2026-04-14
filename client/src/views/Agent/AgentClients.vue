@@ -84,80 +84,129 @@ const updateClient = async () => {
   }
 }
 
+const deleteClient = async (id: string) => {
+  if (!confirm('Удалить клиента?')) return
+
+  try {
+    await axios.delete(`http://localhost:5000/api/users/${id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+
+    clients.value = clients.value.filter(c => c._id !== id)
+  } catch {
+    alert('Ошибка удаления клиента')
+  }
+}
+
 onMounted(loadClients)
 </script>
 
 <template>
   <div class="container">
+
+    <!-- HEADER -->
     <div class="header">
       <h2 class="main-title">Управление клиентами</h2>
-      <button 
-        @click="showCreateForm = !showCreateForm"
-        class="btn-primary">{{ showCreateForm ? 'Скрыть форму' : '+ Добавить клиента' }}
-      </button>
     </div>
 
+    <!-- СПИСОК КЛИЕНТОВ -->
+    <div class="card-grid">
 
-    <!-- Список клиентов -->
-    <div v-for="client in clients" :key="client._id"
-         class="bg-white shadow p-4 mb-3 rounded-xl flex justify-between items-center">
-      <div>
-        <p><strong>ФИО:</strong> {{ client.lastName }} {{ client.firstName }} {{ client.middleName || '' }}</p>
-        <p><strong>Email:</strong> {{ client.email }}</p>
-        <p><strong>Телефон:</strong> {{ client.phone }}</p>
-        <p><strong>Роль:</strong> {{ client.role }}</p>
-      </div>
-      <button @click="editClient(client)" class="bg-yellow-500 text-white px-3 py-1 rounded">
-        Изменить
-      </button>
+      <div v-for="client in clients" :key="client._id" class="card">
 
-    </div>
+        <span class="badge-type">
+          {{ client.role }}
+        </span>
 
-    <!-- Модальное окно редактирования -->
-    <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-      <div class="bg-white rounded-2xl p-6 w-full max-w-md relative">
-        <button @click="showModal = false" class="absolute top-3 right-3 text-gray-500">✕</button>
-        <h3 class="text-xl font-bold mb-4 text-blue-600">Редактировать клиента</h3>
+        <div class="program-name">
+          {{ client.lastName }} {{ client.firstName }}
+        </div>
 
-        <form @submit.prevent="updateClient" class="space-y-4">
+        <div class="program-desc">
+          {{ client.middleName || 'Без отчества' }}
+        </div>
 
-          <div>
-            <label class="block text-sm font-semibold">Фамилия</label>
-            <input v-model="selectedClient.lastName" class="w-full border rounded-lg p-2" />
-          </div>
+        <div class="program-footer">
+          <span>Email:</span>
+          <span class="footer-val">{{ client.email }}</span>
+        </div>
 
-          <div>
-            <label class="block text-sm font-semibold">Имя</label>
-            <input v-model="selectedClient.firstName" class="w-full border rounded-lg p-2" />
-          </div>
+        <div class="program-footer">
+          <span>Телефон:</span>
+          <span class="footer-val">{{ client.phone }}</span>
+        </div>
 
-          <div>
-            <label class="block text-sm font-semibold">Отчество</label>
-            <input v-model="selectedClient.middleName" class="w-full border rounded-lg p-2" />
-          </div>
-
-          <div>
-            <label class="block text-sm font-semibold">Email</label>
-            <input v-model="selectedClient.email" type="email" class="w-full border rounded-lg p-2" />
-          </div>
-
-          <div>
-            <label class="block text-sm font-semibold">Телефон</label>
-            <input v-model="selectedClient.phone" class="w-full border rounded-lg p-2" />
-          </div>
-
-          <div>
-            <label class="block text-sm font-semibold">Дата рождения</label>
-            <input v-model="birthDateString" type="date" class="w-full border rounded-lg p-2" />
-          </div>
-
-
-
-          <button type="submit" :disabled="loading" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
-            Сохранить
+        <div class="card-actions">
+          <button
+              @click="editClient(client)"
+              class="btn-edit"
+          >
+            Редактировать
           </button>
-        </form>
+          <button
+              @click="deleteClient(client._id)"
+              class="btn-edit"
+              style="color:red"
+          >
+            Удалить
+          </button>
+        </div>
+
       </div>
+
     </div>
+
+    <!-- МОДАЛКА -->
+    <div v-if="showModal" class="modal-overlay">
+
+      <div class="modal-window">
+
+        <div class="modal-header">
+          <h3>Редактировать клиента</h3>
+          <button @click="showModal = false">✕</button>
+        </div>
+
+        <form @submit.prevent="updateClient" class="modal-body">
+
+          <div class="form-group">
+            <label class="form-label">Фамилия</label>
+            <input v-model="selectedClient.lastName" class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Имя</label>
+            <input v-model="selectedClient.firstName" class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Отчество</label>
+            <input v-model="selectedClient.middleName" class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input v-model="selectedClient.email" type="email" class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Телефон</label>
+            <input v-model="selectedClient.phone" class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Дата рождения</label>
+            <input v-model="birthDateString" type="date" class="form-input" />
+          </div>
+
+          <button type="submit" :disabled="loading" class="btn-primary btn-submit">
+            {{ loading ? 'Сохранение...' : 'Сохранить изменения' }}
+          </button>
+
+        </form>
+
+      </div>
+
+    </div>
+
   </div>
 </template>
