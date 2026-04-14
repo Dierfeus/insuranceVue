@@ -1,35 +1,140 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import axios from 'axios'
-
-interface Contract {
-  _id: string
-  premiumAmount: number
-  startDate: string
-  durationDays: number
-  status: string
-  client: any
-  agent: any
-}
-
-const contracts = ref<Contract[]>([])
-const showModal = ref(false)
-const loading = ref(false)
 
 const token = localStorage.getItem('token')
 
-const selectedContract = reactive({
-  _id: '',
-  premiumAmount: 0,
+const showCreateForm = ref(false)
+const loading = ref(false)
+
+const approvedClaims = ref<any[]>([])
+const selectedClaimId = ref('')
+const selectedProperties = ref<any[]>([])
+
+const contract = ref({
+  claimId: '',
   startDate: '',
-  durationDays: 0,
-  status: 'active'
+  durationDays: 365,
+  premiumAmount: 0,
+  properties: [] as string[]
 })
 
-const startDateString = ref('')
+// --- загрузка заявок ---
+const fetchClaims = async () => {
+  try {
+    const res = await axios.get('http://localhost:5000/api/claims', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
 
-// загрузка договоров
-const loadContracts = async () => {
+    approvedClaims.value = res.data.filter((c: any) => c.status === 'approved')
+  } catch {
+    alert('Ошибка загрузки заявок')
+  }
+}
+
+watch(selectedClaimId, (val) => {
+  if (!val) return
+
+  const claim = approvedClaims.value.find(c => c._id === val)
+  if (!claim) return
+
+  contract.value = {
+    claimId: val,
+    startDate: claim.startDate ? claim.startDate.split('T')[0] : '',
+    durationDays: claim.durationDays || 365,
+    premiumAmount: 0,
+    properties: []
+  }
+
+  // имущество
+  selectedProperties.value = claim.properties || []
+  contract.value.properties = selectedProperties.value.map(p => p._id)
+
+  contract.value.premiumAmount = selectedProperties.value.reduce(
+      (sum, p) => sum + (p.value || 0),
+      0
+  )
+})
+
+watch(selectedClaimId, async (val) => {
+  if (!val) return
+
+  const claim = approvedClaims.value.find(c => c._id === val)
+  if (!claim) return
+
+  contract.value = {
+    claimId: val,
+    startDate: claim.startDate ? claim.startDate.split('T')[0] : '',
+    durationDays: claim.durationDays || 365,
+    premiumAmount: 0,
+    properties: []
+  }
+
+  // 🔥 ГРУЗИМ ИМУЩЕСТВО КЛИЕНТА
+  await fetchPropertiesByClient(claim.user?._id)
+})
+
+// --- создание договора ---
+const submitContract = async () => {
+  if (!contract.value.claimId) {
+    return alert('Выберите заявку')
+  }
+
+  loading.value = true
+
+  try {
+    await axios.post(
+        'http://localhost:5000/api/contracts',
+        contract.value,
+        { headers: { Authorization: `Bearer ${token}` } }
+    )
+
+    alert('Договор создан')
+    await fetchContracts()
+
+    // сброс
+    contract.value = {
+      claimId: '',
+      startDate: '',
+      durationDays: 365,
+      premiumAmount: 0,
+      properties: []
+    }
+
+    selectedClaimId.value = ''
+    showCreateForm.value = false
+
+  } catch (err: any) {
+    alert(err.response?.data?.message || 'Ошибка создания договора')
+  } finally {
+    loading.value = false
+  }
+}
+
+const fetchPropertiesByClient = async (clientId: string) => {
+  try {
+    const res = await axios.get(
+        `http://localhost:5000/api/property?client=${clientId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+    )
+
+    selectedProperties.value = res.data
+    contract.value.properties = res.data.map((p: any) => p._id)
+
+    // считаем премию
+    contract.value.premiumAmount = res.data.reduce(
+        (sum: number, p: any) => sum + (p.value || 0),
+        0
+    )
+
+  } catch {
+    alert('Ошибка загрузки имущества')
+  }
+}
+
+const contracts = ref<any[]>([])
+
+const fetchContracts = async () => {
   try {
     const res = await axios.get(
         'http://localhost:5000/api/contracts',
@@ -37,217 +142,147 @@ const loadContracts = async () => {
     )
 
     contracts.value = res.data
-  } catch (err) {
-    console.error('Ошибка загрузки договоров', err)
-  }
-}
-
-// открыть редактирование
-const editContract = (contract: Contract) => {
-
-  Object.assign(selectedContract, contract)
-
-  startDateString.value = contract.startDate
-      ? contract.startDate.split('T')[0]
-      : ''
-
-  showModal.value = true
-}
-
-// сохранить
-const updateContract = async () => {
-
-  try {
-
-    loading.value = true
-
-    await axios.put(
-        `http://localhost:5000/api/contracts/${selectedContract._id}`,
-        {
-          premiumAmount: selectedContract.premiumAmount,
-          startDate: startDateString.value,
-          durationDays: selectedContract.durationDays,
-          status: selectedContract.status
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-    )
-
-    alert('Договор обновлён')
-
-    showModal.value = false
-
-    loadContracts()
-
   } catch {
-    alert('Ошибка обновления договора')
-  } finally {
-    loading.value = false
+    alert('Ошибка загрузки договоров')
   }
-
 }
 
-onMounted(loadContracts)
+onMounted(() => {
+  fetchClaims()
+  fetchContracts()
+})
+
 </script>
 
-
 <template>
+  <div class="container">
 
-  <div class="max-w-6xl mx-auto">
-
-    <!-- список договоров -->
-
-    <div
-        v-for="contract in contracts"
-        :key="contract._id"
-        class="bg-white shadow p-4 mb-3 rounded-xl flex justify-between items-center"
-    >
-
-      <div>
-
-        <p>
-          <strong>Клиент:</strong>
-          {{ contract.client?.firstName }} {{ contract.client?.lastName }}
-        </p>
-
-        <p>
-          <strong>Агент:</strong>
-          {{ contract.agent?.firstName }} {{ contract.agent?.lastName }}
-        </p>
-
-        <p>
-          <strong>Стоимость:</strong>
-          {{ contract.premiumAmount }}
-        </p>
-
-        <p>
-          <strong>Дата начала:</strong>
-          {{ new Date(contract.startDate).toLocaleDateString() }}
-        </p>
-
-        <p>
-          <strong>Срок:</strong>
-          {{ contract.durationDays }} дней
-        </p>
-
-        <p>
-          <strong>Статус:</strong>
-          {{ contract.status }}
-        </p>
-
-      </div>
-
+    <!-- HEADER -->
+    <div class="header">
+      <h2 class="main-title">Договоры</h2>
 
       <button
-          @click="editContract(contract)"
-          class="bg-yellow-500 text-white px-3 py-1 rounded"
+          @click="showCreateForm = !showCreateForm"
+          class="btn btn-primary"
+          style="width:auto; padding:10px 16px;"
       >
-        Изменить
+        {{ showCreateForm ? 'Скрыть форму' : '+ Создать договор' }}
       </button>
+    </div>
 
+    <!-- ФОРМА -->
+    <div v-if="showCreateForm" class="creation-form-container">
+
+      <h3 class="form-title">Создание договора</h3>
+
+      <!-- выбор заявки -->
+      <div class="form-group">
+        <label class="form-label">Одобренная заявка</label>
+        <select v-model="selectedClaimId" class="form-select">
+          <option disabled value="">-- Выберите заявку --</option>
+
+          <option
+              v-for="claim in approvedClaims"
+              :key="claim._id"
+              :value="claim._id"
+          >
+            {{ claim._id.slice(-6) }} —
+            {{ claim.propertyData?.address || claim.propertyData?.carModel || 'Имущество' }}
+          </option>
+        </select>
+      </div>
+
+      <!-- если выбрана -->
+      <form
+          v-if="selectedClaimId"
+          @submit.prevent="submitContract"
+          class="form-body"
+      >
+
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label class="form-label">Дата начала</label>
+            <input type="date" v-model="contract.startDate" class="form-input" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Срок (дней)</label>
+            <input type="number" v-model.number="contract.durationDays" class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Премия (₽)</label>
+            <input type="number" v-model.number="contract.premiumAmount" class="form-input text-highlight" />
+          </div>
+
+        </div>
+
+        <!-- имущество -->
+        <div class="form-group">
+          <label class="form-label">Имущество клиента</label>
+
+          <div
+              v-for="prop in selectedProperties"
+              :key="prop._id"
+              class="property-item"
+          >
+            <input
+                type="checkbox"
+                :value="prop._id"
+                v-model="contract.properties"
+            />
+            {{ prop.description }} — {{ prop.value.toLocaleString() }} ₽
+          </div>
+        </div>
+
+        <button
+            type="submit"
+            :disabled="loading"
+            class="btn-primary btn-submit"
+        >
+          {{ loading ? 'Создание...' : 'Создать договор' }}
+        </button>
+
+      </form>
     </div>
 
 
+    <div class="section-container">
 
-    <!-- модальное окно -->
+      <div class="header">
+        <h3 class="main-title">Список договоров</h3>
+      </div>
 
-    <div
-        v-if="showModal"
-        class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center"
-    >
+      <div v-if="contracts.length === 0" class="empty-text">
+        Договоров пока нет
+      </div>
 
-      <div
-          class="bg-white rounded-2xl p-6 w-full max-w-md relative"
-      >
+      <div class="card-grid">
+        <div v-for="c in contracts" :key="c._id" class="card">
 
-        <button
-            @click="showModal = false"
-            class="absolute top-3 right-3 text-gray-500"
-        >
-          ✕
-        </button>
+          <h4 class="program-name">
+            Договор #{{ c._id.slice(-6) }}
+          </h4>
 
-        <h3
-            class="text-xl font-bold mb-4 text-blue-600"
-        >
-          Редактировать договор
-        </h3>
+          <p class="program-desc">
+            Клиент: {{ c.client?.firstName }} {{ c.client?.lastName }}
+          </p>
 
-
-        <form
-            @submit.prevent="updateContract"
-            class="space-y-4"
-        >
-
-          <div>
-            <label class="block text-sm font-semibold">
-              Сумма
-            </label>
-
-            <input
-                v-model.number="selectedContract.premiumAmount"
-                type="number"
-                class="w-full border rounded-lg p-2"
-            />
+          <div class="program-footer">
+            <span>Сумма: <strong>{{ c.premiumAmount }} ₽</strong></span>
+            <span>Срок: <strong>{{ c.durationDays }} дн.</strong></span>
           </div>
 
-
-          <div>
-            <label class="block text-sm font-semibold">
-              Дата начала
-            </label>
-
-            <input
-                v-model="startDateString"
-                type="date"
-                class="w-full border rounded-lg p-2"
-            />
+          <div class="program-footer">
+            <span>Дата: {{ new Date(c.startDate).toLocaleDateString() }}</span>
+            <span>Статус: {{ c.status }}</span>
           </div>
 
-
-          <div>
-            <label class="block text-sm font-semibold">
-              Срок (дней)
-            </label>
-
-            <input
-                v-model.number="selectedContract.durationDays"
-                type="number"
-                class="w-full border rounded-lg p-2"
-            />
-          </div>
-
-
-          <div>
-            <label class="block text-sm font-semibold">
-              Статус
-            </label>
-
-            <select
-                v-model="selectedContract.status"
-                class="w-full border rounded-lg p-2"
-            >
-              <option value="active">active</option>
-              <option value="closed">closed</option>
-            </select>
-          </div>
-
-
-          <button
-              type="submit"
-              :disabled="loading"
-              class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
-          >
-            Сохранить
-          </button>
-
-        </form>
-
+        </div>
       </div>
 
     </div>
 
   </div>
-
 </template>
