@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import { auth } from '../store/auth'
 
 const properties = ref([])
 const claims = ref([])
 const loading = ref(false)
 const token = localStorage.getItem('token')
+const role = auth.role
 
 // Поля для формы оценки
 const selectedClaim = ref<any>(null)

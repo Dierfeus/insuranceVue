@@ -21,7 +21,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { auth } from '../store/auth'
-import { showError } from '../store/errorModal'
+import { showError } from '../store/Modal'
 
 const username = ref('')
 const password = ref('')

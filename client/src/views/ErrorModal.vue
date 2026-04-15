@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { errorModal, errorMessage, hideError } from '../store/errorModal'
+import { errorModal, errorMessage, hideError } from '../store/Modal'
 
 const close = () => hideError()
 </script>
