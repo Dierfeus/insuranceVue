@@ -45,7 +45,6 @@
           </div>
         </div>
         
-        <!-- Правая колонка - изображение / иконки -->
         <div class="hero-image">
           <div class="feature-grid">
             <div class="feature-card">

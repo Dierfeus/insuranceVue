@@ -6,7 +6,7 @@
 
       <!-- Пользователь -->
       <button v-if="role==='user'" :class="tab==='myClaims'?activeTabClass:tabClass" @click="tab='myClaims'">
-        📑 Мои заявки
+       Мои заявки
       </button>
 
 
@@ -16,28 +16,28 @@
       <button v-if="role==='agent' || role==='expert' || role==='inspector'"
               :class="tab==='claims'?activeTabClass:tabClass"
               @click="tab='claims'">
-        📑 Заявки
+        Заявки
       </button>
       <button v-if="role==='agent'" 
               :class="tab==='contracts'?activeTabClass:tabClass" @click="tab='contracts'">
-        📑 Договоры
+        Договоры
       </button>
       <button v-if="role==='agent' || role==='expert' || role==='inspector'" :class="tab==='clients'?activeTabClass:tabClass" @click="tab='clients'">
-        👥 Клиенты
+        Клиенты
       </button>
 
 
 
       <!-- Оценщик -->
       <button v-if="role==='inspector' || role==='agent'" :class="tab==='property'?activeTabClass:tabClass" @click="tab='property'">
-        🏠 Оценка имущества
+        Оценка имущества
       </button>
 
       <!-- Эксперт -->
       <button v-if="role==='expert'"
               :class="tab==='programs'?activeTabClass:tabClass"
               @click="tab='programs'">
-        📑 Программы
+        Программы
       </button>
 
 
