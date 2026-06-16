@@ -46,7 +46,7 @@ const close = () => {
   <div v-if="isVisible" class="modal-overlay" @click.self="close">
     <div class="modal-card" :class="getModalClass()">
       <div class="modal-header">
-        <span class="modal-icon">{{ getIcon() }}</span>
+
         <h2 class="modal-title">{{ title }}</h2>
         <button v-if="type !== 'confirm'" class="modal-close" @click="close">✕</button>
       </div>

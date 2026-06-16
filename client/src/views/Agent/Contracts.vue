@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
 import axios from 'axios'
-import { showSuccess } from '../../store/Modal'
-
+import { showSuccess, showError, showInfo, showConfirm } from '../../store/Modal'
 
 const token = localStorage.getItem('token')
 
@@ -48,7 +47,7 @@ const fetchClaims = async () => {
 
     approvedClaims.value = res.data.filter((c: any) => c.status === 'approved')
   } catch {
-    showSuccess('Ошибка загрузки заявок')
+    showError('Ошибка загрузки заявок')
   }
 }
 
@@ -73,7 +72,8 @@ watch(selectedClaimId, async (val) => {
 // --- создание договора ---
 const submitContract = async () => {
   if (!contract.value.claimId) {
-    return showSuccess('Выберите заявку')
+    showInfo('Выберите заявку для создания договора')
+    return
   }
 
   loading.value = true
@@ -85,7 +85,7 @@ const submitContract = async () => {
         { headers: { Authorization: `Bearer ${token}` } }
     )
 
-    showSuccess('Договор создан')
+    showSuccess('Договор успешно создан')
     await fetchContracts()
 
     // сброс
@@ -101,7 +101,7 @@ const submitContract = async () => {
     showCreateForm.value = false
 
   } catch (err: any) {
-    showSuccess(err.response?.data?.message || 'Ошибка создания договора')
+    showError(err.response?.data?.message || 'Ошибка создания договора')
   } finally {
     loading.value = false
   }
@@ -124,7 +124,7 @@ const fetchPropertiesByClient = async (clientId: string) => {
     )
 
   } catch {
-    showSuccess('Ошибка загрузки имущества')
+    showError('Ошибка загрузки имущества')
   }
 }
 
@@ -139,7 +139,7 @@ const fetchContracts = async () => {
 
     contracts.value = res.data
   } catch {
-    showSuccess('Ошибка загрузки договоров')
+    showError('Ошибка загрузки договоров')
   }
 }
 
@@ -291,7 +291,7 @@ onMounted(() => {
           <h4 class="program-name" style="display: flex; justify-content: space-between; align-items: center;">
             <span>Договор #{{ c._id.slice(-6) }}</span>
             <span style="font-size: 0.6rem; font-weight: 400; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; color: #64748b;">
-              {{ c.status }}
+              {{ c.status === 'active' ? 'Активен' : c.status === 'closed' ? 'Закрыт' : 'Отменён' }}
             </span>
           </h4>
 
