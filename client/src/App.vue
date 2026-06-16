@@ -29,8 +29,8 @@ const UserRole = computed((): string => {
 
         <!-- Логотип слева -->
         <div class="logo" @click="router.push('/')">
-          <div class="logo-icon">SI</div>
-          <span class="logo-text">SafeInsure</span>
+          <div class="logo-icon">БС</div>
+          <span class="logo-text">Безопасное страхование</span>
         </div>
 
         <!-- Кнопки справа -->

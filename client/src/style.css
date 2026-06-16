@@ -87,7 +87,6 @@
 }
 
 .card:hover {
-  transform: translateY(-3px);
   border-color: rgba(100,108,255,0.4);
 }
 

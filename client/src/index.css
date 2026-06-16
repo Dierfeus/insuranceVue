@@ -44,7 +44,6 @@
   .btn-primary:hover {
     background-color: #1d4ed8;
     box-shadow: 0 5px 7px -3px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
   }
 
   .btn-submit {
@@ -56,7 +55,6 @@
   .btn-submit:hover {
     background-color: #0fb361;
     box-shadow: 0 5px 7px -3px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
   }
 
   /* 4. Форма создания */
@@ -118,7 +116,6 @@
 
   .card:hover {
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
   }
 
   /* 6. Элементы внутри карточки */
@@ -244,7 +241,6 @@
 .auth-btn-primary:hover {
     background-color: #1d4ed8;
     box-shadow: 0 5px 7px -3px rgba(0,0,0,0.1);
-    transform: translateY(-2px);
 }
 
 .auth-btn-success {
@@ -254,7 +250,6 @@
 .auth-btn-success:hover {
     background-color: #15803d;
     box-shadow: 0 5px 7px -3px rgba(0,0,0,0.1);
-    transform: translateY(-2px);
 }
 
 .auth-text-link {
@@ -353,7 +348,6 @@
 .btn-profile:hover {
     background-color: #2563eb;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transform: translateY(-1px);
 }
 
 /* Красные кнопки выхода */
@@ -363,7 +357,6 @@
 .btn-logout:hover {
     background-color: #dc2626;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transform: translateY(-1px);
 }
 
 /* === Основной контент === */
