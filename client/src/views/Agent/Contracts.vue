@@ -159,7 +159,7 @@ onMounted(() => {
 
     <!-- HEADER -->
     <div class="header">
-      <h2 class="main-title">Договоры</h2>
+      <h2 class="main-title">Список договоров</h2>
 
       <button
           @click="showCreateForm = !showCreateForm"
@@ -249,10 +249,6 @@ onMounted(() => {
 
 
     <div class="section-container">
-
-      <div class="header">
-        <h3 class="main-title">Список договоров</h3>
-      </div>
 
       <div v-if="contracts.length === 0" class="empty-text">
         Договоров пока нет

@@ -11,7 +11,6 @@ const close = () => hideError()
 
     <h2 class="modal-title">Ошибка</h2>
 
-    <!-- строка или список -->
     <div v-if="Array.isArray(errorMessage)">
       <ul class="modal-list">
       <li v-for="(err, i) in errorMessage" :key="i">
