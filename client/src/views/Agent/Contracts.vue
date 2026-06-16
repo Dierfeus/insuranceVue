@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import axios from 'axios'
 
 const token = localStorage.getItem('token')
@@ -10,6 +10,7 @@ const loading = ref(false)
 const approvedClaims = ref<any[]>([])
 const selectedClaimId = ref('')
 const selectedProperties = ref<any[]>([])
+const searchQuery = ref('')
 
 const contract = ref({
   claimId: '',
@@ -17,6 +18,23 @@ const contract = ref({
   durationDays: 365,
   premiumAmount: 0,
   properties: [] as string[]
+})
+
+// --- ПОИСК ДОГОВОРОВ ---
+const filteredContracts = computed(() => {
+  if (!searchQuery.value) return contracts.value
+  
+  const query = searchQuery.value.toLowerCase().trim()
+  
+  return contracts.value.filter(c => {
+    const idMatch = c._id.slice(-6).toLowerCase().includes(query)
+    const clientMatch = `${c.client?.firstName || ''} ${c.client?.lastName || ''}`.toLowerCase().includes(query)
+    const amountMatch = c.premiumAmount.toString().includes(query)
+    const statusMatch = c.status?.toLowerCase().includes(query)
+    const dateMatch = new Date(c.startDate).toLocaleDateString().includes(query)
+    
+    return idMatch || clientMatch || amountMatch || statusMatch || dateMatch
+  })
 })
 
 // --- загрузка заявок ---
@@ -32,30 +50,6 @@ const fetchClaims = async () => {
   }
 }
 
-watch(selectedClaimId, (val) => {
-  if (!val) return
-
-  const claim = approvedClaims.value.find(c => c._id === val)
-  if (!claim) return
-
-  contract.value = {
-    claimId: val,
-    startDate: claim.startDate ? claim.startDate.split('T')[0] : '',
-    durationDays: claim.durationDays || 365,
-    premiumAmount: 0,
-    properties: []
-  }
-
-  // имущество
-  selectedProperties.value = claim.properties || []
-  contract.value.properties = selectedProperties.value.map(p => p._id)
-
-  contract.value.premiumAmount = selectedProperties.value.reduce(
-      (sum, p) => sum + (p.value || 0),
-      0
-  )
-})
-
 watch(selectedClaimId, async (val) => {
   if (!val) return
 
@@ -70,7 +64,7 @@ watch(selectedClaimId, async (val) => {
     properties: []
   }
 
-  // 🔥 ГРУЗИМ ИМУЩЕСТВО КЛИЕНТА
+  // ГРУЗИМ ИМУЩЕСТВО КЛИЕНТА
   await fetchPropertiesByClient(claim.user?._id)
 })
 
@@ -163,11 +157,35 @@ onMounted(() => {
 
       <button
           @click="showCreateForm = !showCreateForm"
-          class="btn btn-primary"
+          class="btn-primary"
           style="width:auto; padding:10px 16px;"
       >
         {{ showCreateForm ? 'Скрыть форму' : '+ Создать договор' }}
       </button>
+    </div>
+
+    <!-- ПОИСК -->
+    <div style="margin-bottom: 24px;">
+      <div style="position: relative;">
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Поиск договоров..."
+          class="form-input"
+          style="padding-left: 36px;"
+        />
+        <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); opacity: 0.6;">🔍</span>
+        <button
+          v-if="searchQuery"
+          @click="searchQuery = ''"
+          style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #94a3b8;"
+        >
+          ✕
+        </button>
+      </div>
+      <div v-if="searchQuery" style="margin-top: 8px; font-size: 0.8rem; color: #64748b;">
+        Найдено: {{ filteredContracts.length }} из {{ contracts.length }} договоров
+      </div>
     </div>
 
     <!-- ФОРМА -->
@@ -186,7 +204,7 @@ onMounted(() => {
               :key="claim._id"
               :value="claim._id"
           >
-            {{ claim._id.slice(-6) }} —
+            №{{ claim._id.slice(-6) }} —
             {{ claim.propertyData?.address || claim.propertyData?.carModel || 'Имущество' }}
           </option>
         </select>
@@ -199,7 +217,7 @@ onMounted(() => {
           class="form-body"
       >
 
-        <div class="form-grid">
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">
 
           <div class="form-group">
             <label class="form-label">Дата начала</label>
@@ -213,7 +231,7 @@ onMounted(() => {
 
           <div class="form-group">
             <label class="form-label">Премия (₽)</label>
-            <input type="number" v-model.number="contract.premiumAmount" class="form-input text-highlight" />
+            <input type="number" v-model.number="contract.premiumAmount" class="form-input" style="font-weight: 600; color: #2563eb;" />
           </div>
 
         </div>
@@ -225,14 +243,21 @@ onMounted(() => {
           <div
               v-for="prop in selectedProperties"
               :key="prop._id"
-              class="property-item"
+              style="display: flex; align-items: center; gap: 8px; padding: 4px 0;"
           >
             <input
                 type="checkbox"
                 :value="prop._id"
                 v-model="contract.properties"
+                style="width: 16px; height: 16px; cursor: pointer;"
             />
-            {{ prop.description }} — {{ prop.value.toLocaleString() }} ₽
+            <label style="cursor: pointer;">
+              {{ prop.description }} — {{ prop.value.toLocaleString() }} ₽
+            </label>
+          </div>
+          
+          <div v-if="selectedProperties.length === 0" style="color: #94a3b8; font-size: 0.85rem; padding: 8px 0;">
+            У клиента пока нет оцененного имущества
           </div>
         </div>
 
@@ -247,37 +272,49 @@ onMounted(() => {
       </form>
     </div>
 
+    <!-- СПИСОК ДОГОВОРОВ -->
+    <div style="margin-top: 24px;">
 
-    <div class="section-container">
+      <div v-if="filteredContracts.length === 0 && searchQuery" style="text-align: center; padding: 40px; color: #94a3b8;">
+        По запросу ничего не найдено
+      </div>
 
-      <div v-if="contracts.length === 0" class="empty-text">
+      <div v-else-if="contracts.length === 0" style="text-align: center; padding: 40px; color: #94a3b8;">
         Договоров пока нет
       </div>
 
       <div class="card-grid">
-        <div v-for="c in contracts" :key="c._id" class="card">
+        <div v-for="c in filteredContracts" :key="c._id" class="card">
 
-          <h4 class="program-name">
-            Договор #{{ c._id.slice(-6) }}
+          <h4 class="program-name" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Договор #{{ c._id.slice(-6) }}</span>
+            <span style="font-size: 0.6rem; font-weight: 400; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; color: #64748b;">
+              {{ c.status }}
+            </span>
           </h4>
 
           <p class="program-desc">
-            Клиент: {{ c.client?.firstName }} {{ c.client?.lastName }}
+            <strong>Клиент:</strong> {{ c.client?.firstName }} {{ c.client?.lastName }}
+          </p>
+          
+          <p class="program-desc" style="margin-bottom: 4px;">
+            <strong>Телефон:</strong> {{ c.client?.phone || '—' }}
           </p>
 
           <div class="program-footer">
-            <span>Сумма: <strong>{{ c.premiumAmount }} ₽</strong></span>
+            <span>Сумма: <strong style="color: #2563eb;">{{ c.premiumAmount.toLocaleString() }} ₽</strong></span>
             <span>Срок: <strong>{{ c.durationDays }} дн.</strong></span>
           </div>
 
           <div class="program-footer">
-            <span>Дата: {{ new Date(c.startDate).toLocaleDateString() }}</span>
-            <span>Статус: {{ c.status }}</span>
+            <span>{{ new Date(c.startDate).toLocaleDateString() }}</span>
+            <span style="font-weight: 600; color: #475569;">
+              {{ c.status === 'active' ? 'Активен' : c.status === 'closed' ? 'Закрыт' : 'Отменён' }}
+            </span>
           </div>
 
         </div>
       </div>
-
     </div>
 
   </div>
