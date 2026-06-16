@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import axios from 'axios'
-import { auth } from '../../store/auth'
-import { StatusEnum } from '../../type/StatusEnum'
+import {auth} from "../store/auth"
+import { StatusEnum } from '../type/StatusEnum'
 
 const role = computed(() => auth.role)
 
 const claims = ref<any[]>([])
 const programs = ref<any[]>([])
 const showCreateClaim = ref(false)
+const searchQuery = ref('')
 
 const token = localStorage.getItem('token')
 
@@ -48,6 +49,33 @@ const getStatusText = (status: keyof typeof StatusEnum) => {
   return StatusEnum[status] || status
 }
 
+// --- ПОИСК ---
+const filteredClaims = computed(() => {
+  if (!searchQuery.value) return claims.value
+  
+  const query = searchQuery.value.toLowerCase().trim()
+  
+  return claims.value.filter(claim => {
+    const idMatch = claim._id.slice(-6).toLowerCase().includes(query)
+    const programMatch = claim.programName.toLowerCase().includes(query)
+    const clientMatch = claim.userName.toLowerCase().includes(query)
+    const creatorMatch = claim.creatorName?.toLowerCase().includes(query) || false
+    const propertyMatch = claim.propertyInfo.toLowerCase().includes(query)
+    const statusMatch = getStatusText(claim.status).toLowerCase().includes(query)
+    
+    return idMatch || programMatch || clientMatch || propertyMatch || statusMatch || creatorMatch
+  })
+})
+
+// --- проверка возможности изменения статуса ---
+const canApprove = (status: string) => {
+  return status === 'pending' || status === 'evaluated'
+}
+
+const canReject = (status: string) => {
+  return status === 'pending'
+}
+
 // --- загрузка ---
 const loadPrograms = async () => {
   const res = await axios.get('http://localhost:5000/api/programs', {
@@ -72,6 +100,10 @@ const loadClaims = async () => {
     userName: c.user
         ? `${c.user.lastName || ''} ${c.user.firstName || ''}`
         : '-',
+    creatorName: c.createdBy
+        ? `${c.createdBy.lastName || ''} ${c.createdBy.firstName || ''}`
+        : (role.value === 'agent' ? 'Агент' : 'Пользователь'),
+    creatorRole: c.createdBy?.role || c.creatorRole || (role.value === 'agent' ? 'agent' : 'user'),
     propertyInfo:
         c.propertyData?.address ||
         c.propertyData?.carModel ||
@@ -164,16 +196,28 @@ const deleteClaim = async (id: string) => {
 }
 
 const changeStatus = async (id: string, status: string) => {
-  await axios.put(
-      `http://localhost:5000/api/claims/${id}/status`,
-      { status },
-      { headers: { Authorization: `Bearer ${token}` } }
-  )
+  const statusText = status === 'approved' ? 'одобрить' : 'отклонить'
+  if (!confirm(`Вы уверены, что хотите ${statusText} эту заявку?`)) return
 
-  await loadClaims()
+  try {
+    await axios.put(
+        `http://localhost:5000/api/claims/${id}/status`,
+        { status },
+        { headers: { Authorization: `Bearer ${token}` } }
+    )
+    await loadClaims()
+  } catch (err) {
+    alert('Ошибка изменения статуса')
+  }
 }
 
 const formatDate = (d: string) => new Date(d).toLocaleDateString()
+
+// --- определение роли создателя для отображения ---
+const getCreatorLabel = (role: string) => {
+  if (role === 'agent') return 'Создал: Агент'
+  return 'Создал: Пользователь'
+}
 
 onMounted(async () => {
   await loadPrograms()
@@ -198,6 +242,30 @@ onMounted(async () => {
       </button>
     </div>
 
+    <!-- ПОИСК -->
+    <div style="margin-bottom: 24px;">
+      <div style="position: relative;">
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Поиск заявок..."
+          class="form-input"
+          style="padding-left: 36px;"
+        />
+        <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); opacity: 0.6;">🔍</span>
+        <button
+          v-if="searchQuery"
+          @click="searchQuery = ''"
+          style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #94a3b8;"
+        >
+          ✕
+        </button>
+      </div>
+      <div v-if="searchQuery" style="margin-top: 8px; font-size: 0.8rem; color: #64748b;">
+        Найдено: {{ filteredClaims.length }} из {{ claims.length }} заявок
+      </div>
+    </div>
+
     <!-- ФОРМА -->
     <div v-if="showCreateClaim" class="creation-form-container">
       <span class="form-title">Создание заявки</span>
@@ -211,7 +279,7 @@ onMounted(async () => {
               v-model="newClaim.phone"
               class="form-input"
           />
-          <p v-if="errors.phone" class="text-red-500 text-sm">
+          <p v-if="errors.phone" style="color: #dc2626; font-size: 0.75rem; margin-top: 4px;">
             {{ errors.phone }}
           </p>
         </div>
@@ -227,7 +295,7 @@ onMounted(async () => {
             </option>
           </select>
 
-          <p v-if="errors.program" class="text-red-500 text-sm">
+          <p v-if="errors.program" style="color: #dc2626; font-size: 0.75rem; margin-top: 4px;">
             {{ errors.program }}
           </p>
         </div>
@@ -261,7 +329,7 @@ onMounted(async () => {
               class="form-input"
           />
 
-          <p v-if="errors.startDate" class="text-red-500 text-sm">
+          <p v-if="errors.startDate" style="color: #dc2626; font-size: 0.75rem; margin-top: 4px;">
             {{ errors.startDate }}
           </p>
         </div>
@@ -273,25 +341,37 @@ onMounted(async () => {
       </form>
     </div>
 
-    <!-- СПИСОК ЗАЯВОК -->
+    <div v-if="filteredClaims.length === 0 && searchQuery" style="text-align: center; padding: 40px; color: #94a3b8;">
+      По запросу ничего не найдено
+    </div>
+
     <div class="card-grid">
 
-      <div v-for="claim in claims" :key="claim._id" class="card">
+      <div v-for="claim in filteredClaims" :key="claim._id" class="card">
 
-        <span class="badge-type">
-          №{{ claim._id.slice(-6) }}
-        </span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span class="badge-type">
+            №{{ claim._id.slice(-6) }}
+          </span>
+          <span style="font-size: 10px; color: #64748b;">
+            {{ getCreatorLabel(claim.creatorRole) }}
+          </span>
+        </div>
 
         <div class="program-name">
           {{ claim.programName }}
         </div>
 
         <div class="program-desc">
-          {{ claim.propertyInfo }}
+          <strong>Клиент:</strong> {{ claim.userName }}
+        </div>
+
+        <div class="program-desc">
+          <strong>Имущество:</strong> {{ claim.propertyInfo }}
         </div>
 
         <div class="program-footer">
-          <span>Срок: <b class="footer-val">{{ claim.durationDays }}</b></span>
+          <span>Срок: <b class="footer-val">{{ claim.durationDays }}</b> дн.</span>
           <span>{{ formatDate(claim.startDate) }}</span>
         </div>
 
@@ -304,6 +384,7 @@ onMounted(async () => {
         <!-- ДЕЙСТВИЯ -->
         <div class="card-actions">
 
+          <!-- Пользователь: удаление только своих pending заявок -->
           <button
               v-if="role === 'user' && claim.status === 'pending'"
               @click="deleteClaim(claim._id)"
@@ -313,12 +394,23 @@ onMounted(async () => {
             Удалить
           </button>
 
+          <!-- Агент: одобрение/отклонение в зависимости от статуса -->
           <template v-if="role === 'agent'">
-            <button @click="changeStatus(claim._id,'approved')" class="btn-edit">
-              ✔ Одобрить
+            <button 
+              v-if="canApprove(claim.status)"
+              @click="changeStatus(claim._id, 'approved')" 
+              class="btn-edit"
+              style="background: #d1fae5; color: #059669;"
+            >
+              Одобрить
             </button>
-            <button @click="changeStatus(claim._id,'rejected')" class="btn-edit">
-              ✖ Отклонить
+            <button 
+              v-if="canReject(claim.status)"
+              @click="changeStatus(claim._id, 'rejected')" 
+              class="btn-edit"
+              style="background: #fee2e2; color: #dc2626;"
+            >
+              Отклонить
             </button>
           </template>
 
