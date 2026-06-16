@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
 import axios from 'axios'
+import { showSuccess } from '../../store/Modal'
+
 
 const token = localStorage.getItem('token')
 
@@ -46,7 +48,7 @@ const fetchClaims = async () => {
 
     approvedClaims.value = res.data.filter((c: any) => c.status === 'approved')
   } catch {
-    alert('Ошибка загрузки заявок')
+    showSuccess('Ошибка загрузки заявок')
   }
 }
 
@@ -71,7 +73,7 @@ watch(selectedClaimId, async (val) => {
 // --- создание договора ---
 const submitContract = async () => {
   if (!contract.value.claimId) {
-    return alert('Выберите заявку')
+    return showSuccess('Выберите заявку')
   }
 
   loading.value = true
@@ -83,7 +85,7 @@ const submitContract = async () => {
         { headers: { Authorization: `Bearer ${token}` } }
     )
 
-    alert('Договор создан')
+    showSuccess('Договор создан')
     await fetchContracts()
 
     // сброс
@@ -99,7 +101,7 @@ const submitContract = async () => {
     showCreateForm.value = false
 
   } catch (err: any) {
-    alert(err.response?.data?.message || 'Ошибка создания договора')
+    showSuccess(err.response?.data?.message || 'Ошибка создания договора')
   } finally {
     loading.value = false
   }
@@ -122,7 +124,7 @@ const fetchPropertiesByClient = async (clientId: string) => {
     )
 
   } catch {
-    alert('Ошибка загрузки имущества')
+    showSuccess('Ошибка загрузки имущества')
   }
 }
 
@@ -137,7 +139,7 @@ const fetchContracts = async () => {
 
     contracts.value = res.data
   } catch {
-    alert('Ошибка загрузки договоров')
+    showSuccess('Ошибка загрузки договоров')
   }
 }
 

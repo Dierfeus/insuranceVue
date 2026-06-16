@@ -3,6 +3,7 @@ import { ref, reactive, computed, onMounted, watch } from 'vue'
 import axios from 'axios'
 import {auth} from "../store/auth"
 import { StatusEnum } from '../type/StatusEnum'
+import { showSuccess, showError, showInfo, showConfirm } from '../store/Modal'
 
 const role = computed(() => auth.role)
 
@@ -78,37 +79,45 @@ const canReject = (status: string) => {
 
 // --- загрузка ---
 const loadPrograms = async () => {
-  const res = await axios.get('http://localhost:5000/api/programs', {
-    headers: { Authorization: `Bearer ${token}` }
-  })
-  programs.value = res.data
+  try {
+    const res = await axios.get('http://localhost:5000/api/programs', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    programs.value = res.data
+  } catch (err) {
+    showError('Ошибка загрузки программ')
+  }
 }
 
 const loadClaims = async () => {
-  const url =
-      role.value === 'user'
-          ? 'http://localhost:5000/api/claims/my'
-          : 'http://localhost:5000/api/claims'
+  try {
+    const url =
+        role.value === 'user'
+            ? 'http://localhost:5000/api/claims/my'
+            : 'http://localhost:5000/api/claims'
 
-  const res = await axios.get(url, {
-    headers: { Authorization: `Bearer ${token}` }
-  })
+    const res = await axios.get(url, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
 
-  claims.value = res.data.map((c: any) => ({
-    ...c,
-    programName: c.program?.name || '-',
-    userName: c.user
-        ? `${c.user.lastName || ''} ${c.user.firstName || ''}`
-        : '-',
-    creatorName: c.createdBy
-        ? `${c.createdBy.lastName || ''} ${c.createdBy.firstName || ''}`
-        : (role.value === 'agent' ? 'Агент' : 'Пользователь'),
-    creatorRole: c.createdBy?.role || c.creatorRole || (role.value === 'agent' ? 'agent' : 'user'),
-    propertyInfo:
-        c.propertyData?.address ||
-        c.propertyData?.carModel ||
-        '-'
-  }))
+    claims.value = res.data.map((c: any) => ({
+      ...c,
+      programName: c.program?.name || '-',
+      userName: c.user
+          ? `${c.user.lastName || ''} ${c.user.firstName || ''}`
+          : '-',
+      creatorName: c.createdBy
+          ? `${c.createdBy.lastName || ''} ${c.createdBy.firstName || ''}`
+          : (role.value === 'agent' ? 'Агент' : 'Пользователь'),
+      creatorRole: c.createdBy?.role || c.creatorRole || (role.value === 'agent' ? 'agent' : 'user'),
+      propertyInfo:
+          c.propertyData?.address ||
+          c.propertyData?.carModel ||
+          '-'
+    }))
+  } catch (err) {
+    showError('Ошибка загрузки заявок')
+  }
 }
 
 // --- ВАЛИДАЦИЯ ---
@@ -167,15 +176,15 @@ const submitClaim = async () => {
 
     showCreateClaim.value = false
     await loadClaims()
+    
+    showSuccess('Заявка успешно создана')
 
   } catch (err: any) {
-
     if (err.response?.status === 404) {
       errors.phone = 'Клиент не найден'
       return
     }
-
-    alert('Ошибка создания заявки')
+    showError('Ошибка создания заявки')
   }
 }
 
@@ -185,35 +194,55 @@ watch(() => newClaim.programId, () => errors.program = '')
 watch(() => newClaim.startDate, () => errors.startDate = '')
 
 // --- действия ---
-const deleteClaim = async (id: string) => {
-  if (!confirm('Удалить заявку?')) return
-
-  await axios.delete(`http://localhost:5000/api/claims/${id}`, {
-    headers: { Authorization: `Bearer ${token}` }
+const deleteClaim = (id: string) => {
+  showConfirm({
+    title: 'Удаление заявки',
+    message: 'Вы действительно хотите удалить эту заявку? Это действие нельзя отменить.',
+    confirmText: 'Удалить',
+    cancelText: 'Отмена',
+    onConfirm: async () => {
+      try {
+        await axios.delete(`http://localhost:5000/api/claims/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        await loadClaims()
+        showSuccess('Заявка успешно удалена')
+      } catch (err) {
+        showError('Ошибка удаления заявки')
+      }
+    }
   })
-
-  await loadClaims()
 }
 
-const changeStatus = async (id: string, status: string) => {
+const changeStatus = (id: string, status: string) => {
   const statusText = status === 'approved' ? 'одобрить' : 'отклонить'
-  if (!confirm(`Вы уверены, что хотите ${statusText} эту заявку?`)) return
-
-  try {
-    await axios.put(
-        `http://localhost:5000/api/claims/${id}/status`,
-        { status },
-        { headers: { Authorization: `Bearer ${token}` } }
-    )
-    await loadClaims()
-  } catch (err) {
-    alert('Ошибка изменения статуса')
-  }
+  
+  showConfirm({
+    title: 'Изменение статуса',
+    message: `Вы уверены, что хотите ${statusText} эту заявку?`,
+    confirmText: status === 'approved' ? 'Одобрить' : 'Отклонить',
+    cancelText: 'Отмена',
+    onConfirm: async () => {
+      try {
+        await axios.put(
+            `http://localhost:5000/api/claims/${id}/status`,
+            { status },
+            { headers: { Authorization: `Bearer ${token}` } }
+        )
+        await loadClaims()
+        showSuccess(`Заявка ${status === 'approved' ? 'одобрена' : 'отклонена'}`)
+      } catch (err) {
+        showError('Ошибка изменения статуса')
+      }
+    }
+  })
 }
 
-const formatDate = (d: string) => new Date(d).toLocaleDateString()
+const formatDate = (d: string) => {
+  if (!d) return '—'
+  return new Date(d).toLocaleDateString()
+}
 
-// --- определение роли создателя для отображения ---
 const getCreatorLabel = (role: string) => {
   if (role === 'agent') return 'Создал: Агент'
   return 'Создал: Пользователь'

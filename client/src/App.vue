@@ -3,7 +3,7 @@ import { auth } from './store/auth'
 import { useRouter } from 'vue-router'
 import { RolesEnum } from './type/RolesEnum.ts'
 import { computed } from 'vue'
-import ErrorModal from './views/ErrorModal.vue'
+import Modal from './views/components/Modal.vue'
 
 const router = useRouter()
 
@@ -53,5 +53,5 @@ const UserRole = computed((): string => {
   </div>
 
   <!-- общее модальное окно ошибок-->
-  <ErrorModal />
+  <Modal />
 </template>

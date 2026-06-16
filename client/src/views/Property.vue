@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import { auth } from '../store/auth'
+import { showSuccess } from '../store/Modal'
 
 const properties = ref([])
 const claims = ref([])
@@ -72,7 +73,7 @@ const startEvaluation = (claim: any) => {
 }
 
 const submitEvaluation = async () => {
-  if (evaluationValue.value <= 0) return alert('Введите корректную стоимость')
+  if (evaluationValue.value <= 0) return showSuccess('Введите корректную стоимость')
   
   loading.value = true
   try {
@@ -86,12 +87,12 @@ const submitEvaluation = async () => {
       headers: { Authorization: `Bearer ${token}` }
     })
 
-    alert('Имущество успешно оценено!')
+    showSuccess('Имущество успешно оценено!')
     selectedClaim.value = null
     searchQuery.value = ''
     fetchData() // Обновляем списки
   } catch (err) {
-    alert('Ошибка при сохранении оценки')
+    showSuccess('Ошибка при сохранении оценки')
   } finally {
     loading.value = false
   }

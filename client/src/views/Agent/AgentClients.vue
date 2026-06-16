@@ -2,6 +2,8 @@
 import { ref, reactive, onMounted, watch } from 'vue'
 import axios from 'axios'
 import { computed } from 'vue';
+import { showSuccess } from '../../store/Modal'
+
 
 
 const searchQuery = ref('');
@@ -90,11 +92,12 @@ const updateClient = async () => {
         },
         { headers: { Authorization: `Bearer ${token}` } }
     )
-    alert('Клиент обновлён')
+    showSuccess('Клиент обновлён')
+
     showModal.value = false
     loadClients()
   } catch (err) {
-    alert('Ошибка обновления клиента')
+    showSuccess('Ошибка обновления клиента')
   } finally {
     loading.value = false
   }
@@ -110,7 +113,7 @@ const deleteClient = async (id: string) => {
 
     clients.value = clients.value.filter(c => c._id !== id)
   } catch {
-    alert('Ошибка удаления клиента')
+    showSuccess('Ошибка удаления клиента')
   }
 }
 

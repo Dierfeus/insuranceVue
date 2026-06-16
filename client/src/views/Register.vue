@@ -29,7 +29,8 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { auth } from '../store/auth'
-import { showError } from '../store/Modal'
+import { showError,  showSuccess } from '../store/Modal'
+
 
 const firstName = ref('')
 const lastName = ref('')
@@ -57,7 +58,7 @@ const register = async () => {
       birthDate: birthDate.value
     })
 
-    alert('Аккаунт создан!')
+    showSuccess('Аккаунт создан!')
     router.push('/')
   } catch (e) {
     showError('Ошибка регистрации')

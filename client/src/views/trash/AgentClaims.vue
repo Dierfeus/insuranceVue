@@ -2,6 +2,7 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import axios from 'axios'
 import { auth } from '../../store/auth'
+import { showSuccess } from '../../store/Modal'
 
 const token = localStorage.getItem('token')
 const role = auth.role
@@ -128,7 +129,7 @@ const submitClaim = async () => {
       { headers: { Authorization: `Bearer ${token}` } }
     )
     
-    alert('Заявка создана')
+     showSuccess('Заявка создана')
     
     // Сброс формы
     Object.assign(form, {
@@ -150,7 +151,7 @@ const submitClaim = async () => {
     
   } catch(err: any) {
     console.error(err)
-    alert(err.response?.data?.message || 'Ошибка создания заявки')
+     showSuccess(err.response?.data?.message || 'Ошибка создания заявки')
   } finally {
     loading.value = false
   }
@@ -198,11 +199,11 @@ const changeStatus = async (claimId: string, newStatus: string) => {
       { headers: { Authorization: `Bearer ${token}` } }
     )
     
-    alert('Статус обновлён')
+    showSuccess('Статус обновлён')
     await loadAllClaims()
   } catch (err) {
     console.error(err)
-    alert('Ошибка обновления статуса')
+    showSuccess('Ошибка обновления статуса')
   }
 }
 

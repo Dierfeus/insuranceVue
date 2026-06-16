@@ -2,6 +2,7 @@
 import { ref, onMounted, watch } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import { showSuccess } from '../../store/Modal'
 
 const router = useRouter()
 
@@ -24,7 +25,7 @@ const fetchUser = async () => {
         ? user.value.birthDate.split('T')[0]
         : ''
   } catch (err) {
-    alert('Ошибка при загрузке данных')
+     showSuccess('Ошибка при загрузке данных')
   }
 }
 
@@ -57,9 +58,9 @@ const saveProfile = async () => {
     )
 
     editMode.value = false
-    alert('Профиль обновлён')
+     showSuccess('Профиль обновлён')
   } catch (err) {
-    alert('Ошибка обновления')
+     showSuccess('Ошибка обновления')
   } finally {
     loading.value = false
   }

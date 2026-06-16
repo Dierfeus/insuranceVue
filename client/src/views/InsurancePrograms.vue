@@ -143,7 +143,7 @@ const fetchPrograms = async () => {
     );
     programs.value = res.data;
   } catch (err) {
-    alert('Ошибка при загрузке программ');
+    showSuccess('Ошибка при загрузке программ');
   }
 };
 
@@ -156,9 +156,9 @@ const submitProgram = async () => {
     
     newProgram.value = { name: '', description: '', type: 'apartment', coverage: 500000, price: 5000, durationDays: 365 };
     showCreateForm.value = false;
-    alert('Программа успешно создана');
+    showSuccess('Программа успешно создана');
   } catch (err) {
-    alert(err.response?.data?.message || 'Ошибка при сохранении');
+    showSuccess(err.response?.data?.message || 'Ошибка при сохранении');
   } finally {
     loading.value = false;
   }
