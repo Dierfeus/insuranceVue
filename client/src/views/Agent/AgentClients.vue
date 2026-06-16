@@ -1,6 +1,22 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch } from 'vue'
 import axios from 'axios'
+import { computed } from 'vue';
+
+
+const searchQuery = ref('');
+
+const filteredClients = computed(() => {
+  if (!searchQuery.value) return clients.value;
+  
+  const query = searchQuery.value.toLowerCase();
+  return clients.value.filter(client => 
+    client.lastName.toLowerCase().includes(query) ||
+    client.firstName.toLowerCase().includes(query) ||
+    client.email.toLowerCase().includes(query) ||
+    client.phone.includes(query)
+  );
+});
 
 interface Client {
   _id: string
@@ -109,10 +125,20 @@ onMounted(loadClients)
       <h2 class="main-title">Управление клиентами</h2>
     </div>
 
-    <!-- СПИСОК КЛИЕНТОВ -->
+    
+    <!-- Внутри div class="container", перед card-grid -->
+<div class="mb-4">
+  <input
+    v-model="searchQuery"
+    type="text"
+    placeholder="🔍 Поиск по фамилии, имени, email или телефону..."
+    class="w-full p-2 border rounded-lg"
+  />
+</div>
+
     <div class="card-grid">
 
-      <div v-for="client in clients" :key="client._id" class="card">
+      <div v-for="client in filteredClients" :key="client._id" class="card">
 
         <span class="badge-type">
           {{ client.role }}
