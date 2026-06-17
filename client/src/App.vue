@@ -3,7 +3,7 @@ import { auth } from './store/auth'
 import { useRouter } from 'vue-router'
 import { RolesEnum } from './type/RolesEnum.ts'
 import { computed } from 'vue'
-import Modal from './views/components/Modal.vue'
+import Modal from './components/Modal.vue'
 
 const router = useRouter()
 

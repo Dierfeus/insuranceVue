@@ -5,12 +5,8 @@ import { LightningIcon, HandshakeIcon, DevicePhoneIcon, ShieldIcon } from '../co
 
 <template>
   <div class="landing-page">
-    
-    <!-- Hero секция -->
     <div class="hero-section">
       <div class="hero-content">
-        
-        <!-- Левая колонка - текст -->
         <div class="hero-text">
           <h1 class="hero-title">
             Надёжная страховая защита<br>
@@ -51,36 +47,27 @@ import { LightningIcon, HandshakeIcon, DevicePhoneIcon, ShieldIcon } from '../co
         <div class="hero-image">
           <div class="feature-grid">
             <div class="feature-card">
-              <div class="feature-icon">
-                <CarIcon />
-              </div>
+              <div class="feature-icon"><CarIcon /></div>
               <h4>Автострахование</h4>
               <p>КАСКО и ОСАГО</p>
             </div>
             <div class="feature-card">
-              <div class="feature-icon">
-                <ApartmentIcon />
-              </div>
+              <div class="feature-icon"><ApartmentIcon /></div>
               <h4>Недвижимость</h4>
               <p>Квартиры и дома</p>
             </div>
             <div class="feature-card">
-              <div class="feature-icon">
-                <PlaneIcon />
-              </div>
+              <div class="feature-icon"><PlaneIcon /></div>
               <h4>Здоровье</h4>
               <p>ДМС и страховка</p>
             </div>
             <div class="feature-card">
-              <div class="feature-icon">
-                <HomeIcon />
-              </div>
+              <div class="feature-icon"><HomeIcon /></div>
               <h4>Бизнес</h4>
               <p>Для компаний</p>
             </div>
           </div>
         </div>
-        
       </div>
     </div>
     
@@ -89,30 +76,22 @@ import { LightningIcon, HandshakeIcon, DevicePhoneIcon, ShieldIcon } from '../co
       
       <div class="benefits-grid">
         <div class="benefit-card">
-          <div class="feature-icon">
-            <LightningIcon />
-          </div>
+          <div class="feature-icon"><LightningIcon /></div>
           <h4>Быстрое оформление</h4>
           <p>Заявка занимает всего 5 минут, а полис приходит на email в течение часа</p>
         </div>
         <div class="benefit-card">
-          <div class="feature-icon">
-            <HandshakeIcon />
-          </div>
+          <div class="feature-icon"><HandshakeIcon /></div>
           <h4>Честные выплаты</h4>
           <p>98% заявок одобряются и оплачиваются в полном объёме в срок до 14 дней</p>
         </div>
         <div class="benefit-card">
-          <div class="feature-icon">
-            <DevicePhoneIcon />
-          </div>
+          <div class="feature-icon"><DevicePhoneIcon /></div>
           <h4>Личный кабинет</h4>
           <p>Отслеживайте статус заявок, управляйте договорами и получайте уведомления</p>
         </div>
         <div class="benefit-card">
-          <div class="feature-icon">
-            <ShieldIcon />
-          </div>
+          <div class="feature-icon"><ShieldIcon /></div>
           <h4>Надёжная защита</h4>
           <p>Работаем с ведущими перестраховщиками, гарантируем финансовую стабильность</p>
         </div>
@@ -128,20 +107,16 @@ import { LightningIcon, HandshakeIcon, DevicePhoneIcon, ShieldIcon } from '../co
         </router-link>
       </div>
     </div>
-    
   </div>
 </template>
 
-
 <style scoped>
-/* Основные переменные */
 .landing-page {
   min-height: 100vh;
   background: #f8fafc;
   font-family: 'Inter', sans-serif;
 }
 
-/* Hero секция */
 .hero-section {
   background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%);
   padding: 60px 40px 80px;
@@ -160,7 +135,6 @@ import { LightningIcon, HandshakeIcon, DevicePhoneIcon, ShieldIcon } from '../co
   width: 100%;
 }
 
-/* Левая колонка */
 .hero-text {
   display: flex;
   flex-direction: column;
@@ -231,7 +205,6 @@ import { LightningIcon, HandshakeIcon, DevicePhoneIcon, ShieldIcon } from '../co
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
 }
 
@@ -243,11 +216,9 @@ import { LightningIcon, HandshakeIcon, DevicePhoneIcon, ShieldIcon } from '../co
 
 .btn-secondary:hover {
   color: #2563eb;
-  transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
-/* Правая колонка - иконки */
 .hero-image {
   display: flex;
   justify-content: center;
@@ -354,7 +325,6 @@ import { LightningIcon, HandshakeIcon, DevicePhoneIcon, ShieldIcon } from '../co
   color: rgba(255, 255, 255, 0.8);
 }
 
-/* Секция преимуществ */
 .benefits-section {
   padding: 80px 40px;
   background: white;
@@ -411,20 +381,37 @@ import { LightningIcon, HandshakeIcon, DevicePhoneIcon, ShieldIcon } from '../co
 }
 
 .benefit-card:hover {
-  transform: translateY(-4px);
   box-shadow: 0 12px 30px rgba(37, 99, 235, 0.2);
   border-color: #2563eb;
 }
 
-.benefit-icon {
-  font-size: 2.8rem;
-  margin-bottom: 16px;
-  display: inline-block;
-  transition: transform 0.4s ease;
+.benefit-card .feature-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  background: #eff6ff;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2563eb;
+  transition: all 0.4s ease;
 }
 
-.benefit-card:hover .benefit-icon {
-  transform: scale(1.2);
+.benefit-card:hover .feature-icon {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.benefit-card .feature-icon :deep(svg) {
+  width: 28px;
+  height: 28px;
+  color: #2563eb;
+  transition: all 0.4s ease;
+}
+
+.benefit-card:hover .feature-icon :deep(svg) {
+  color: white;
 }
 
 .benefit-card h4 {
@@ -451,7 +438,6 @@ import { LightningIcon, HandshakeIcon, DevicePhoneIcon, ShieldIcon } from '../co
   color: rgba(255, 255, 255, 0.85);
 }
 
-/* CTA секция */
 .cta-section {
   padding: 80px 40px;
   background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
@@ -483,11 +469,9 @@ import { LightningIcon, HandshakeIcon, DevicePhoneIcon, ShieldIcon } from '../co
 
 .cta-content .btn-primary:hover {
   background: #f8fafc;
-  transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
-/* Адаптивность */
 @media (max-width: 1024px) {
   .hero-content {
     grid-template-columns: 1fr;

@@ -1,6 +1,6 @@
 <!-- src/views/Modal.vue -->
 <script setup lang="ts">
-import { modal, hideModal } from '../../store/Modal'
+import { modal, hideModal } from '../store/Modal'
 import { computed } from 'vue'
 
 const isVisible = computed(() => modal.value.visible)
