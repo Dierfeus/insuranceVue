@@ -1,0 +1,8 @@
+export { default as CarIcon } from './CarIcon.vue'
+export { default as HomeIcon } from './HomeIcon.vue'
+export { default as PlaneIcon } from './PlaneIcon.vue'
+export { default as ApartmentIcon } from './ApartmentIcon.vue'
+export { default as LightningIcon } from './LightningIcon.vue'
+export { default as HandshakeIcon } from './HandshakeIcon.vue'
+export { default as DevicePhoneIcon } from './DevicePhoneIcon.vue'
+export { default as ShieldIcon } from './ShieldIcon.vue'
