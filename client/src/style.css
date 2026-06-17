@@ -1,214 +1,445 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+/* 1. Главный контейнер (Обертка страницы) */
 .container {
-  width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
-  text-align: left;
-}
+    max-width: 1000px;
+    margin: 2rem auto;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    font-family: 'Inter', sans-serif;
+  }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-}
+  /* 2. Шапка и заголовок */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
 
-.main-title {
-  font-size: 1.6rem;
-  font-weight: 600;
-}
+  .main-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #2563eb;
+    margin: 0;
+  }
 
-.creation-form-container {
-  background: #1e1e1e;
-  padding: 1.5rem;
-  border-radius: 12px;
-  margin-bottom: 2rem;
-  border: 1px solid rgba(255,255,255,0.05);
-}
+  /* 3. Кнопки */
+  .btn-primary {
+    background-color: #2563eb;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
 
-.form-title {
-  margin-bottom: 1rem;
-  font-weight: 600;
-}
+  .btn-primary:hover {
+    background-color: #1d4ed8;
+    box-shadow: 0 5px 7px -3px rgba(0, 0, 0, 0.1);
+  }
 
+  .btn-submit {
+    width: 100%;
+    margin-top: 1rem;
+    background-color: #0fc96c; /* Зеленый для публикации */
+  }
 
-.form-label {
-  display: block;
-  font-size: 0.85rem;
-  margin-bottom: 0.3rem;
-  opacity: 0.7;
-}
+  .btn-submit:hover {
+    background-color: #0fb361;
+    box-shadow: 0 5px 7px -3px rgba(0, 0, 0, 0.1);
+  }
 
-.form-input,
-.form-textarea,
-.form-select {
-  width: 100%;
-  padding: 0.5rem;
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.1);
-  background: #2a2a2a;
-  color: white;
-  font-family: inherit;
-}
+  /* 4. Форма создания */
+  .creation-form-container {
+    background-color: #f8fafc;
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 32px;
 
-.form-input:focus,
-.form-textarea:focus,
-.form-select:focus {
-  outline: none;
-  border-color: #646cff;
-}
+  }
 
-.btn-primary {
-  background: #646cff;
-  color: white;
-  border: none;
-}
+  .form-title {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 8px;
+  }
 
-.btn-primary:hover {
-  background: #535bf2;
-}
+  .form-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #101011;
+    margin-top: 10px;
+  }
 
-.btn-submit {
-  margin-top: 0.5rem;
-  width: 100%;
-}
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
 
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1rem;
-}
+  .form-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
 
-.card {
-  background: #1e1e1e;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.05);
-  transition: 0.2s;
-}
+  /* 5. Сетка и карточки программ */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+  }
 
-.card:hover {
-  border-color: rgba(100,108,255,0.4);
-}
+  .card {
+    border: 1px solid #f1f5f9;
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+  }
 
-.program-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+  .card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
 
-.program-name {
-  margin: 0.5rem 0;
-  font-weight: 600;
-}
+  /* 6. Элементы внутри карточки */
+  .badge-type {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    background: #eff6ff;
+    color: #2563eb;
+    border-radius: 4px;
+  }
 
-.program-desc {
-  font-size: 0.9rem;
-  opacity: 0.8;
-  margin-bottom: 0.5rem;
-}
+  .program-price {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #2563eb;
+  }
 
-.program-price {
-  font-weight: bold;
-  color: #646cff;
-}
+  .program-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 12px 0 8px 0;
+    color: #1e293b;
+  }
 
-.badge-type {
-  font-size: 1rem;
-  padding: 0.2rem 0.5rem;
-  border-radius: 6px;
-  background: rgba(100,108,255,0.15);
-}
+  .program-desc {
+    font-size: 0.875rem;
+    color: #64748b;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
 
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  z-index: 50;
-}
+  .program-footer {
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #94a3b8;
+  }
 
+  .footer-val {
+    color: #475569;
+    font-weight: 600;
+  }
 
-/* регистрация */
+  /* Стили для кнопок управления (Редактировать/Удалить) */
+  .card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
 
+  .btn-edit {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+    background: #f1f5f9;
+    color: #475569;
+    border-radius: 6px;
+  }
+
+/* === Общие стили для всех форм (вход/регистрация) === */
 .auth-page {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.auth-page--green {
-  background: linear-gradient(to right, #22c55e, #10b981);
-}
-
-.auth-page--blue {
-  background: linear-gradient(to right, #3b82f6, #6366f1);
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(to right, var(--primary), #6366f1); /* можно менять градиент через классы */
+    padding: 2rem;
+    width: 100%;
 }
 
 .auth-card {
-  background: #fff;
-  padding: 30px;
-  border-radius: 20px;
-  width: 380px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    width: 100%;
+    max-width: 400px;
+    font-family: 'Inter', sans-serif;
 }
 
 .auth-title {
-  font-size: 24px;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 20px;
+    font-size: 1.75rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--primary);
 }
 
 .auth-input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 12px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  font-size: 14px;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s;
 }
 
-.auth-button {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: none;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.3s;
+.auth-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.auth-button--green {
-  background: #16a34a;
+.auth-btn {
+    width: 100%;
+    padding: 12px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #fff;
 }
 
-.auth-button--green:hover {
-  background: #15803d;
+.auth-btn-primary {
+    background-color: #2563eb;
 }
 
-.auth-button--blue {
-  background: #2563eb;
+.auth-btn-primary:hover {
+    background-color: #1d4ed8;
+    box-shadow: 0 5px 7px -3px rgba(0,0,0,0.1);
 }
 
-.auth-button--blue:hover {
-  background: #1d4ed8;
+.auth-btn-success {
+    background-color: #16a34a;
 }
 
-.auth-footer {
-  margin-top: 10px;
-  font-size: 13px;
-  text-align: center;
+.auth-btn-success:hover {
+    background-color: #15803d;
+    box-shadow: 0 5px 7px -3px rgba(0,0,0,0.1);
 }
 
-.auth-link {
-  color: #3b82f6;
-  text-decoration: none;
+.auth-text-link {
+    text-align: center;
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+}
+
+.auth-text-link a {
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-text-link a:hover {
+    text-decoration: underline;
+}
+
+
+/* === Общие обертки === */
+.page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background-color: #f8fafc;
+}
+
+/* === Хедер === */
+.header {
+    width: 100%;
+    background-color: #ffffff;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 32px;
+}
+
+
+
+/* Логотип */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    background-color: #2563eb;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.logo-text {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2563eb;
+}
+
+/* Навигация */
+.header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* Кнопки */
+.btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    color: #fff;
+    transition: all 0.2s ease;
+}
+.btn svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2;
+}
+
+/* Синие кнопки профиля */
+.btn-profile {
+    background-color: #3b82f6;
+}
+.btn-profile:hover {
+    background-color: #2563eb;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Красные кнопки выхода */
+.btn-logout {
+    background-color: #ef4444;
+}
+.btn-logout:hover {
+    background-color: #dc2626;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* === Основной контент === */
+.main-content {
+    flex: 1;
+    padding: 24px 32px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Ошибка модалка */
+.error-modal {
+    border: 1px solid #fecaca;
+}
+
+.error-text {
+    color: #dc2626;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px 0;
+}
+
+/* затемнение фона */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+/* окно */
+.modal-card {
+    width: 100%;
+    max-width: 420px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    animation: pop .15s ease-out;
+}
+
+/* заголовок */
+.modal-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #dc2626;
+    margin-bottom: 10px;
+}
+
+/* текст */
+.modal-text {
+    font-size: 14px;
+    color: #374151;
+    margin-bottom: 16px;
+}
+
+/* список ошибок */
+.modal-list {
+    padding-left: 18px;
+    color: #dc2626;
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+/* кнопка */
+.modal-btn {
+    width: 100%;
+    padding: 10px;
+    background: #2563eb;
+    color: white;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.modal-btn:hover {
+    background: #1d4ed8;
+}
+
+@keyframes pop {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
