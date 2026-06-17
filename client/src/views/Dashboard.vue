@@ -8,7 +8,7 @@
       <button v-if="role==='user'" :class="tab==='myClaims'?activeTabClass:tabClass" @click="tab='myClaims'">
        Мои заявки
       </button>
-
+      
 
 
 
@@ -34,9 +34,7 @@
       </button>
 
       <!-- Эксперт -->
-      <button v-if="role==='expert'"
-              :class="tab==='programs'?activeTabClass:tabClass"
-              @click="tab='programs'">
+      <button v-if="role==='expert' || role==='user'" :class="tab==='programs'?activeTabClass:tabClass" @click="tab='programs'">
         Программы
       </button>
 
@@ -62,7 +60,7 @@
         <UserClaims />
       </div>
 
-      <div v-if="tab==='programs' && role==='expert'">
+      <div v-if="tab==='programs' && (role==='expert' || role==='user')">
         <InsuranceProgram />
       </div>
 

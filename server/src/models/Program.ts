@@ -1,3 +1,4 @@
+// server/src/models/Program.ts
 import mongoose from 'mongoose'
 
 export interface IProgram {
@@ -7,6 +8,7 @@ export interface IProgram {
     coverage: number       // страховая сумма
     price: number          // стоимость программы
     durationDays: number   // рекомендуемый срок действия
+    imageUrl?: string      // URL изображения
 }
 
 const ProgramSchema = new mongoose.Schema<IProgram>({
@@ -15,7 +17,8 @@ const ProgramSchema = new mongoose.Schema<IProgram>({
     type: { type: String, enum: ['home','apartment','car','other'], required: true },
     coverage: { type: Number, required: true },
     price: { type: Number, required: true },
-    durationDays: { type: Number, required: true }
+    durationDays: { type: Number, required: true },
+    imageUrl: { type: String, required: false } // добавлено поле для изображения
 }, { timestamps: true })
 
 export default mongoose.model('Program', ProgramSchema)
