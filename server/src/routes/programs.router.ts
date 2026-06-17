@@ -13,7 +13,6 @@ const router = Router()
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = './uploads/programs'
-    // Создаем папку, если её нет
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true })
     }
@@ -25,7 +24,6 @@ const storage = multer.diskStorage({
   }
 })
 
-// Фильтр файлов
 const fileFilter = (req: any, file: any, cb: any) => {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg']
   if (allowedTypes.includes(file.mimetype)) {
@@ -37,11 +35,11 @@ const fileFilter = (req: any, file: any, cb: any) => {
 
 const upload = multer({ 
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter
 })
 
-// --- Получить все программы (доступно всем) ---
+// --- Получить все программы ---
 router.get('/', authMiddleware, async (req: any, res) => {
     try {
         const programs = await Program.find().sort({ createdAt: -1 })
@@ -51,12 +49,11 @@ router.get('/', authMiddleware, async (req: any, res) => {
     }
 })
 
-// --- Создать новую программу (только expert) ---
-router.post('/', authMiddleware, roleMiddleware('expert'), upload.single('image'), async (req: any, res) => {
+// --- Создать новую программу (с несколькими изображениями) ---
+router.post('/', authMiddleware, roleMiddleware('expert'), upload.array('images', 5), async (req: any, res) => {
     try {
         const { name, description, type, coverage, price, durationDays } = req.body
         
-        // Проверяем, что все поля заполнены
         if (!name || !description || !type || !coverage || !price || !durationDays) {
             return res.status(400).json({ message: 'Все поля обязательны' })
         }
@@ -64,10 +61,10 @@ router.post('/', authMiddleware, roleMiddleware('expert'), upload.single('image'
         const existing = await Program.findOne({ name })
         if (existing) return res.status(400).json({ message: 'Program with this name already exists' })
 
-        // Формируем URL изображения
-        let imageUrl = null
-        if (req.file) {
-            imageUrl = `/uploads/programs/${req.file.filename}`
+        // 🆕 Формируем массив URL изображений
+        let images: string[] = []
+        if (req.files && req.files.length > 0) {
+            images = (req.files as Express.Multer.File[]).map(file => `/uploads/programs/${file.filename}`)
         }
 
         const program = await Program.create({ 
@@ -77,7 +74,7 @@ router.post('/', authMiddleware, roleMiddleware('expert'), upload.single('image'
             coverage, 
             price, 
             durationDays,
-            imageUrl 
+            images
         })
         
         res.json(program)
@@ -87,15 +84,14 @@ router.post('/', authMiddleware, roleMiddleware('expert'), upload.single('image'
     }
 })
 
-// --- Изменить программу (только expert) ---
-router.put('/:id', authMiddleware, roleMiddleware('expert'), upload.single('image'), async (req: any, res) => {
+// --- Изменить программу ---
+router.put('/:id', authMiddleware, roleMiddleware('expert'), upload.array('images', 5), async (req: any, res) => {
     try {
-        const { name, description, type, coverage, price, durationDays } = req.body
+        const { name, description, type, coverage, price, durationDays, existingImages } = req.body
         
         const program = await Program.findById(req.params.id)
         if (!program) return res.status(404).json({ message: 'Program not found' })
 
-        // Обновляем поля
         program.name = name || program.name
         program.description = description || program.description
         program.type = type || program.type
@@ -103,18 +99,22 @@ router.put('/:id', authMiddleware, roleMiddleware('expert'), upload.single('imag
         program.price = price || program.price
         program.durationDays = durationDays || program.durationDays
 
-        // Если загружено новое изображение
-        if (req.file) {
-            // Удаляем старое изображение, если оно было
-            if (program.imageUrl) {
-                const oldPath = path.join('.', program.imageUrl)
-                if (fs.existsSync(oldPath)) {
-                    fs.unlinkSync(oldPath)
-                }
-            }
-            program.imageUrl = `/uploads/programs/${req.file.filename}`
+        // 🆕 Обработка изображений
+        let images: string[] = []
+        
+        // Сохраняем существующие изображения
+        if (existingImages) {
+            const existing = Array.isArray(existingImages) ? existingImages : [existingImages]
+            images = [...existing]
         }
 
+        // Добавляем новые изображения
+        if (req.files && req.files.length > 0) {
+            const newImages = (req.files as Express.Multer.File[]).map(file => `/uploads/programs/${file.filename}`)
+            images = [...images, ...newImages]
+        }
+
+        program.images = images
         await program.save()
         res.json(program)
     } catch (err) {
@@ -123,17 +123,19 @@ router.put('/:id', authMiddleware, roleMiddleware('expert'), upload.single('imag
     }
 })
 
-// --- Удалить программу (только expert) ---
+// --- Удалить программу ---
 router.delete('/:id', authMiddleware, roleMiddleware('expert'), async (req: any, res) => {
     try {
         const program = await Program.findById(req.params.id)
         if (!program) return res.status(404).json({ message: 'Program not found' })
 
-        // Удаляем изображение, если оно было
-        if (program.imageUrl) {
-            const imagePath = path.join('.', program.imageUrl)
-            if (fs.existsSync(imagePath)) {
-                fs.unlinkSync(imagePath)
+        // 🆕 Удаляем все изображения
+        if (program.images && program.images.length > 0) {
+            for (const imagePath of program.images) {
+                const fullPath = path.join('.', imagePath)
+                if (fs.existsSync(fullPath)) {
+                    fs.unlinkSync(fullPath)
+                }
             }
         }
 
@@ -144,7 +146,7 @@ router.delete('/:id', authMiddleware, roleMiddleware('expert'), async (req: any,
     }
 })
 
-// --- Получить программу по id (доступно всем) ---
+// --- Получить программу по id ---
 router.get('/:id', authMiddleware, async (req: any, res) => {
     try {
         const program = await Program.findById(req.params.id)

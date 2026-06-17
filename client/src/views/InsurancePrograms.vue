@@ -13,6 +13,9 @@ const token = localStorage.getItem('token');
 const fileInput = ref(null);
 const userRole = ref(null);
 
+// 🆕 Для карусели - используем обычный объект вместо сложного типа
+const currentImageIndex = ref({});
+
 const canManage = computed(() => {
   return userRole.value === 'expert';
 });
@@ -24,8 +27,9 @@ const formData = ref({
   coverage: 500000,
   price: 5000,
   durationDays: 365,
-  image: null,
-  imagePreview: ''
+  images: [], // 🆕 массив файлов
+  existingImages: [], // 🆕 существующие URL
+  imagePreviews: [] // 🆕 превью для отображения
 });
 
 const filteredPrograms = computed(() => {
@@ -55,15 +59,9 @@ const getTypeLabel = (type) => {
   return types[type] || type;
 };
 
-// Функция для получения полного URL изображения
 const getImageUrl = (imagePath) => {
   if (!imagePath) return '';
-  // Если путь уже начинается с http, возвращаем как есть
   if (imagePath.startsWith('http')) return imagePath;
-  // Иначе добавляем базовый URL сервера
-  // Обратите внимание: путь должен начинаться с /uploads/programs/
-  // Если в базе хранится /uploads/programs/... или uploads/programs/...
-  // Нормализуем путь
   let normalizedPath = imagePath;
   if (!normalizedPath.startsWith('/')) {
     normalizedPath = '/' + normalizedPath;
@@ -71,9 +69,34 @@ const getImageUrl = (imagePath) => {
   return `http://localhost:5000${normalizedPath}`;
 };
 
-// Обработчик ошибки загрузки изображения
+// 🆕 Управление каруселью
+const getCurrentImageIndex = (programId) => {
+  return currentImageIndex.value[programId] || 0;
+};
+
+const nextImage = (programId, images) => {
+  const current = getCurrentImageIndex(programId);
+  const max = images.length - 1;
+  currentImageIndex.value[programId] = current >= max ? 0 : current + 1;
+};
+
+const prevImage = (programId, images) => {
+  const current = getCurrentImageIndex(programId);
+  const max = images.length - 1;
+  currentImageIndex.value[programId] = current <= 0 ? max : current - 1;
+};
+
+const getCurrentImage = (program) => {
+  if (!program.images || program.images.length === 0) return '';
+  const index = getCurrentImageIndex(program._id);
+  return getImageUrl(program.images[index]);
+};
+
+const hasMultipleImages = (program) => {
+  return program.images && program.images.length > 1;
+};
+
 const handleImageError = (event) => {
-  console.error('Ошибка загрузки изображения:', event.target.src);
   event.target.style.display = 'none';
   const parent = event.target.parentElement;
   parent.classList.add('placeholder');
@@ -85,14 +108,48 @@ const fetchPrograms = async () => {
     const res = await axios.get('http://localhost:5000/api/programs', 
       { headers: { Authorization: `Bearer ${token}` } }
     );
-    console.log('Загружены программы:', res.data); // Проверяем данные
     programs.value = res.data;
   } catch (err) {
     showError('Ошибка при загрузке программ');
   }
 };
 
-// Остальной код без изменений...
+// 🆕 Обработка загрузки нескольких файлов
+const handleFileUpload = (event) => {
+  const files = event.target.files;
+  if (!files || files.length === 0) return;
+
+  for (const file of files) {
+    if (file.size > 5 * 1024 * 1024) {
+      showInfo(`Файл ${file.name} превышает 5MB`);
+      continue;
+    }
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      showInfo(`Файл ${file.name} имеет недопустимый формат`);
+      continue;
+    }
+    formData.value.images.push(file);
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      formData.value.imagePreviews.push(e.target.result);
+    };
+    reader.readAsDataURL(file);
+  }
+  
+  // Сбрасываем input
+  if (fileInput.value) fileInput.value.value = '';
+};
+
+const removeImage = (index) => {
+  formData.value.images.splice(index, 1);
+  formData.value.imagePreviews.splice(index, 1);
+};
+
+const removeExistingImage = (index) => {
+  formData.value.existingImages.splice(index, 1);
+};
+
 const openCreateForm = () => {
   if (!canManage.value) return;
   isEditing.value = false;
@@ -114,8 +171,9 @@ const resetForm = () => {
     coverage: 500000,
     price: 5000,
     durationDays: 365,
-    image: null,
-    imagePreview: ''
+    images: [],
+    existingImages: [],
+    imagePreviews: []
   };
   if (fileInput.value) fileInput.value.value = '';
 };
@@ -131,43 +189,15 @@ const editProgram = (program) => {
     coverage: program.coverage,
     price: program.price,
     durationDays: program.durationDays,
-    image: null,
-    imagePreview: program.imageUrl ? getImageUrl(program.imageUrl) : ''
+    images: [],
+    existingImages: program.images || [],
+    imagePreviews: (program.images || []).map(img => getImageUrl(img))
   };
   showForm.value = true;
 };
 
 const triggerFileInput = () => {
   fileInput.value?.click();
-};
-
-const handleFileUpload = (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  if (file.size > 5 * 1024 * 1024) {
-    showInfo('Размер файла не должен превышать 5MB');
-    return;
-  }
-
-  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-    showInfo('Разрешены только JPEG, PNG и WEBP');
-    return;
-  }
-
-  formData.value.image = file;
-  
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    formData.value.imagePreview = e.target.result;
-  };
-  reader.readAsDataURL(file);
-};
-
-const removeImage = () => {
-  formData.value.image = null;
-  formData.value.imagePreview = '';
-  if (fileInput.value) fileInput.value.value = '';
 };
 
 const submitProgram = async () => {
@@ -204,8 +234,16 @@ const submitProgram = async () => {
     submitData.append('price', formData.value.price);
     submitData.append('durationDays', formData.value.durationDays);
     
-    if (formData.value.image) {
-      submitData.append('image', formData.value.image);
+    // 🆕 Добавляем существующие изображения
+    if (formData.value.existingImages.length > 0) {
+      for (const img of formData.value.existingImages) {
+        submitData.append('existingImages', img);
+      }
+    }
+    
+    // 🆕 Добавляем новые изображения
+    for (const file of formData.value.images) {
+      submitData.append('images', file);
     }
 
     if (isEditing.value) {
@@ -273,7 +311,6 @@ onMounted(async () => {
 </script>
 
 <template>
-  <!-- Остальной шаблон без изменений -->
   <div class="container">
     <div class="header">
       <h2 class="main-title">Страховые программы</h2>
@@ -314,28 +351,101 @@ onMounted(async () => {
       <h3 class="form-title">{{ isEditing ? 'Редактирование программы' : 'Параметры новой программы' }}</h3>
       
       <form @submit.prevent="submitProgram" class="program-form">
-        <!-- ... поля формы ... -->
-        
         <div class="form-group">
-          <label class="form-label">Изображение программы</label>
+          <label class="form-label">Название программы</label>
+          <input
+            v-model="formData.name"
+            type="text"
+            class="form-input"
+            placeholder="Например: КАСКО Премиум"
+            required
+          />
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Тип объекта</label>
+            <select v-model="formData.type" class="form-select" required>
+              <option value="home">Дом</option>
+              <option value="apartment">Квартира</option>
+              <option value="car">Автомобиль</option>
+              <option value="other">Иное</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Срок (дней)</label>
+            <input
+              v-model.number="formData.durationDays"
+              type="number"
+              min="1"
+              class="form-input"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Покрытие (₽)</label>
+            <input
+              v-model.number="formData.coverage"
+              type="number"
+              class="form-input"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Цена (₽)</label>
+            <input
+              v-model.number="formData.price"
+              type="number"
+              class="form-input price-input"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Описание условий</label>
+          <textarea
+            v-model="formData.description"
+            rows="3"
+            class="form-textarea"
+            required
+          ></textarea>
+        </div>
+
+        <!-- 🆕 Загрузка нескольких изображений -->
+        <div class="form-group">
+          <label class="form-label">Изображения программы (до 5 шт.)</label>
           <div class="file-upload-wrapper">
             <div class="file-upload-area" @click="triggerFileInput">
-              <div v-if="formData.imagePreview" class="image-preview">
-                <img :src="formData.imagePreview" alt="Preview" />
-                <button type="button" class="remove-image" @click.stop="removeImage">✕</button>
-              </div>
-              <div v-else class="upload-placeholder">
-                <p>Нажмите для загрузки изображения</p>
-                <span class="upload-hint">PNG, JPG, WEBP до 5MB</span>
+              <div class="upload-placeholder">
+                <span class="upload-icon">📷</span>
+                <p>Нажмите для загрузки изображений</p>
+                <span class="upload-hint">PNG, JPG, WEBP до 5MB, до 5 файлов</span>
               </div>
             </div>
             <input
               ref="fileInput"
               type="file"
               accept="image/*"
+              multiple
               @change="handleFileUpload"
               class="file-input-hidden"
             />
+          </div>
+          
+          <!-- 🆕 Превью загруженных изображений -->
+          <div v-if="formData.imagePreviews.length > 0 || formData.existingImages.length > 0" class="image-previews">
+            <div v-for="(img, index) in formData.imagePreviews" :key="'new-' + index" class="image-preview-item">
+              <img :src="img" alt="Preview" />
+              <button type="button" class="remove-image-btn" @click="removeImage(index)">✕</button>
+            </div>
+            <div v-for="(img, index) in formData.existingImages" :key="'existing-' + index" class="image-preview-item">
+              <img :src="getImageUrl(img)" alt="Existing" />
+              <button type="button" class="remove-image-btn" @click="removeExistingImage(index)">✕</button>
+            </div>
           </div>
         </div>
 
@@ -364,15 +474,37 @@ onMounted(async () => {
       <div class="card-grid">
         <div v-for="prog in filteredPrograms" :key="prog._id" class="card">
 
-          <div class="program-image" v-if="prog.imageUrl">
-            <img 
-              :src="getImageUrl(prog.imageUrl)" 
-              :alt="prog.name" 
-              @error="handleImageError"
-            />
-          </div>
-          <div class="program-image placeholder" v-else>
-            <span>Нет изображения</span>
+          <!-- 🆕 Карусель изображений -->
+          <div class="program-image-wrapper">
+            <div class="program-image" v-if="prog.images && prog.images.length > 0">
+              <img 
+                :src="getCurrentImage(prog)" 
+                :alt="prog.name" 
+                @error="handleImageError"
+              />
+              <!-- 🆕 Кнопки навигации -->
+              <button 
+                v-if="hasMultipleImages(prog)" 
+                class="image-nav image-nav-prev" 
+                @click.stop="prevImage(prog._id, prog.images)"
+              >
+                ‹
+              </button>
+              <button 
+                v-if="hasMultipleImages(prog)" 
+                class="image-nav image-nav-next" 
+                @click.stop="nextImage(prog._id, prog.images)"
+              >
+                ›
+              </button>
+              <!-- 🆕 Индикатор количества -->
+              <span v-if="hasMultipleImages(prog)" class="image-counter">
+                {{ getCurrentImageIndex(prog._id) + 1 }} / {{ prog.images.length }}
+              </span>
+            </div>
+            <div class="program-image placeholder" v-else>
+              <span>Нет изображений</span>
+            </div>
           </div>
 
           <div class="program-footer">
@@ -403,7 +535,6 @@ onMounted(async () => {
 
   </div>
 </template>
-
 
 <style scoped>
 .container {
@@ -632,7 +763,7 @@ onMounted(async () => {
   text-align: center;
   cursor: pointer;
   transition: all 0.2s;
-  min-height: 150px;
+  min-height: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -648,43 +779,6 @@ onMounted(async () => {
   display: none;
 }
 
-.image-preview {
-  position: relative;
-  width: 100%;
-  max-height: 200px;
-  overflow: hidden;
-  border-radius: 8px;
-}
-
-.image-preview img {
-  width: 100%;
-  height: auto;
-  max-height: 200px;
-  object-fit: contain;
-}
-
-.remove-image {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  font-size: 14px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-.remove-image:hover {
-  background: rgba(220, 38, 38, 0.8);
-}
-
 .upload-placeholder {
   display: flex;
   flex-direction: column;
@@ -693,18 +787,64 @@ onMounted(async () => {
 }
 
 .upload-icon {
-  font-size: 2.5rem;
+  font-size: 2rem;
 }
 
 .upload-placeholder p {
   margin: 0;
   color: #475569;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 .upload-hint {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #94a3b8;
+}
+
+/* 🆕 Превью загруженных изображений */
+.image-previews {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.image-preview-item {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.image-preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-image-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.remove-image-btn:hover {
+  background: #b91c1c;
+  transform: scale(1.1);
 }
 
 /* Список программ */
@@ -740,16 +880,22 @@ onMounted(async () => {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
+/* 🆕 Стили для карусели */
+.program-image-wrapper {
+  position: relative;
+  width: 100%;
+}
+
 .program-image {
   width: 100%;
-  height: 160px;
+  height: 200px;
   border-radius: 8px;
   overflow: hidden;
   background: #f1f5f9;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 12px;
+  position: relative;
 }
 
 .program-image img {
@@ -763,6 +909,51 @@ onMounted(async () => {
   color: #94a3b8;
   text-align: center;
   padding: 8px;
+}
+
+/* 🆕 Кнопки навигации */
+.image-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  z-index: 2;
+}
+
+.image-nav:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.image-nav-prev {
+  left: 8px;
+}
+
+.image-nav-next {
+  right: 8px;
+}
+
+/* 🆕 Индикатор количества */
+.image-counter {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  z-index: 2;
 }
 
 .program-footer {
@@ -871,6 +1062,16 @@ onMounted(async () => {
   
   .card-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .program-image {
+    height: 180px;
+  }
+  
+  .image-nav {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
   }
 }
 </style>
