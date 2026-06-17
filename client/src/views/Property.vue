@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import { auth } from '../store/auth'
-import { showSuccess } from '../store/Modal'
+import { showSuccess, showError, showInfo } from '../store/Modal'
 
 const properties = ref([])
 const claims = ref([])
@@ -53,32 +53,38 @@ const filteredProperties = computed(() => {
 
 const fetchData = async () => {
   try {
-    const headers = { Authorization: `Bearer ${token}` }
-    const resProp = await axios.get('http://localhost:5000/api/property',
-    { headers:{ Authorization:`Bearer ${token}` }} )
+    const resProp = await axios.get('http://localhost:5000/api/property', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
     properties.value = resProp.data
-    const resClaims = await axios.get('http://localhost:5000/api/claims',
-      { headers:{ Authorization:`Bearer ${token}` }} )
+    
+    const resClaims = await axios.get('http://localhost:5000/api/claims', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
     claims.value = resClaims.data
   } catch (err) {
+    showError('Ошибка загрузки данных')
     console.error('Ошибка загрузки данных', err)
   }
 }
 
 const startEvaluation = (claim: any) => {
   selectedClaim.value = claim
-  // Предзаполняем описание данными из заявки (адрес или модель авто)
   const data = claim.propertyData
-  evaluationDescription.value = `Объект по адресу: ${data.address || ''} ${data.carModel || ''}`.trim()
+  evaluationDescription.value = `Объект: ${data.address || data.carModel || ''}`.trim()
 }
 
 const submitEvaluation = async () => {
-  if (evaluationValue.value <= 0) return showSuccess('Введите корректную стоимость')
+  if (evaluationValue.value <= 0) {
+    showInfo('Введите корректную стоимость')
+    return
+  }
   
   loading.value = true
+  
   try {
     const payload = {
-      client: selectedClaim.value.user, // ID клиента из заявки
+      client: selectedClaim.value.user,
       description: evaluationDescription.value,
       value: evaluationValue.value
     }
@@ -89,10 +95,12 @@ const submitEvaluation = async () => {
 
     showSuccess('Имущество успешно оценено!')
     selectedClaim.value = null
+    evaluationValue.value = 0
     searchQuery.value = ''
-    fetchData() // Обновляем списки
+    await fetchData()
   } catch (err) {
-    showSuccess('Ошибка при сохранении оценки')
+    showError('Ошибка при сохранении оценки')
+    console.error('Ошибка сохранения оценки', err)
   } finally {
     loading.value = false
   }
@@ -104,6 +112,11 @@ onMounted(fetchData)
 <template>
   <div class="container">
     
+    <!-- HEADER -->
+    <div class="header">
+      <h2 class="main-title">Оценка имущества</h2>
+    </div>
+
     <!-- ПОИСК -->
     <div style="margin-bottom: 24px;">
       <div style="position: relative;">
@@ -130,10 +143,12 @@ onMounted(fetchData)
     </div>
 
     <!-- заявки на оценку -->
-    <section v-if="role==='inspector'">
-      <div class="header">
-        <h2 class="main-title">Новые заявки на оценку</h2>
-     </div>
+    <section v-if="role === 'inspector'">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 1.1rem; font-weight: 600; color: #1e293b; margin: 0;">
+          Новые заявки на оценку
+        </h3>
+      </div>
       
       <div v-if="filteredClaims.length === 0 && searchQuery" style="text-align: center; padding: 40px; color: #94a3b8;">
         По запросу ничего не найдено
@@ -145,30 +160,28 @@ onMounted(fetchData)
       
       <div class="card-grid">
         <div v-for="claim in filteredClaims" :key="claim._id" class="card">
-
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span class="badge-type">№{{ claim._id.slice(-6) }}</span>
-              <span style="font-size: 10px; color: #64748b;">
-                {{ claim.status === 'pending' ? 'Ожидает оценки' : claim.status }}
-              </span>
-            </div>
-            
-            <div class="program-name">
-                {{ claim.propertyData.address || claim.propertyData.carModel || 'Имущество' }}
-            </div>
-            
-            <div class="program-desc">
-              <strong>Клиент:</strong> {{ claim.user?.lastName || '' }} {{ claim.user?.firstName || '' }}
-            </div>
-            
-            <div class="program-footer">
-              <span>Программа: {{ claim.program?.name || '-' }}</span>
-            </div>
-            
-            <button @click="startEvaluation(claim)" class="btn-primary" style="width:100%; margin-top:12px;">
-              Оценить
-            </button>
-
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span class="badge-type">№{{ claim._id.slice(-6) }}</span>
+            <span style="font-size: 10px; color: #64748b;">
+              {{ claim.status === 'pending' ? 'Ожидает оценки' : claim.status }}
+            </span>
+          </div>
+          
+          <div class="program-name">
+            {{ claim.propertyData.address || claim.propertyData.carModel || 'Имущество' }}
+          </div>
+          
+          <div class="program-desc">
+            <strong>Клиент:</strong> {{ claim.user?.lastName || '' }} {{ claim.user?.firstName || '' }}
+          </div>
+          
+          <div class="program-footer">
+            <span>Программа: {{ claim.program?.name || '-' }}</span>
+          </div>
+          
+          <button @click="startEvaluation(claim)" class="btn-primary" style="width:100%; margin-top:12px;">
+            Оценить
+          </button>
         </div>
       </div>
     </section>
@@ -176,15 +189,25 @@ onMounted(fetchData)
     <!-- МОДАЛЬНОЕ ОКНО / ФОРМА ОЦЕНКИ -->
     <div v-if="selectedClaim" class="modal-overlay" @click.self="selectedClaim = null">
       <div class="modal-card" style="max-width: 500px;">
-        <h3 class="modal-title" style="color: #1e293b;">Оценка имущества</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px;">
+          <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #1e293b;">Оценка имущества</h3>
+          <button 
+            @click="selectedClaim = null" 
+            style="background: none; border: none; font-size: 1.2rem; color: #94a3b8; cursor: pointer; padding: 4px 8px; border-radius: 6px;"
+            @mouseenter="(e) => e.target.style.background = '#f1f5f9'"
+            @mouseleave="(e) => e.target.style.background = 'transparent'"
+          >
+            ✕
+          </button>
+        </div>
         
         <div style="display: flex; flex-direction: column; gap: 16px;">
-          <div>
+          <div class="form-group">
             <label class="form-label">Описание для протокола</label>
             <textarea v-model="evaluationDescription" class="form-textarea" rows="3" />
           </div>
           
-          <div>
+          <div class="form-group">
             <label class="form-label">Оценочная стоимость (₽)</label>
             <input 
               v-model.number="evaluationValue" 
@@ -197,19 +220,19 @@ onMounted(fetchData)
 
           <div style="display: flex; gap: 12px; padding-top: 8px;">
             <button 
+              @click="selectedClaim = null" 
+              class="btn-edit" 
+              style="flex: 1; padding: 10px;"
+            > 
+              Отмена 
+            </button>
+            <button 
               @click="submitEvaluation" 
               :disabled="loading" 
               class="btn-primary" 
               style="flex: 2;"
             >
               {{ loading ? 'Сохранение...' : 'Подтвердить оценку' }}
-            </button>
-            <button 
-              @click="selectedClaim = null" 
-              class="btn-edit" 
-              style="flex: 1;"
-            > 
-              Отмена 
             </button>
           </div>
         </div>
@@ -218,9 +241,11 @@ onMounted(fetchData)
 
     <!-- СЕКЦИЯ 2: СПИСОК УЖЕ ОЦЕНЕННОГО -->
     <section style="margin-top: 32px;">
-      <div class="header">
-        <h2 class="main-title">Архив оценок</h2>
-     </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 1.1rem; font-weight: 600; color: #1e293b; margin: 0;">
+          Архив оценок
+        </h3>
+      </div>
 
       <div v-if="filteredProperties.length === 0 && searchQuery" style="text-align: center; padding: 40px; color: #94a3b8;">
         По запросу ничего не найдено
@@ -256,3 +281,157 @@ onMounted(fetchData)
 
   </div>
 </template>
+
+<style scoped>
+/* Дополнительные стили для этого компонента */
+.program-price {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.badge-type {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  background: #eff6ff;
+  color: #2563eb;
+  border-radius: 4px;
+}
+
+.program-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 12px 0 8px 0;
+  color: #1e293b;
+}
+
+.program-desc {
+  font-size: 0.875rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.program-footer {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.btn-primary {
+  background-color: #2563eb;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #1d4ed8;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-edit {
+  font-size: 0.75rem;
+  padding: 6px 12px;
+  background: #f1f5f9;
+  color: #475569;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-edit:hover {
+  background: #e2e8f0;
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #101011;
+  margin-bottom: 4px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 500px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: pop 0.2s ease-out;
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-card {
+    margin: 10px;
+    padding: 20px;
+  }
+}
+</style>
