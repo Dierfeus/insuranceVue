@@ -1,6 +1,36 @@
 <script setup lang="ts">
 import { CarIcon, HomeIcon, PlaneIcon, ApartmentIcon } from '../components/icons/index'
 import { LightningIcon, HandshakeIcon, DevicePhoneIcon, ShieldIcon } from '../components/icons/index'
+import { auth } from '../store/auth'
+import { useRouter } from 'vue-router'
+import { onMounted } from 'vue'
+
+const router = useRouter()
+
+// Если пользователь уже авторизован - перенаправляем в дашборд
+onMounted(() => {
+  if (auth.token) {
+    router.push('/dashboard')
+  }
+})
+
+// Функция для перехода на страницу входа с проверкой
+const goToLogin = () => {
+  if (auth.token) {
+    router.push('/dashboard')
+  } else {
+    router.push('/login')
+  }
+}
+
+// Функция для перехода на страницу регистрации с проверкой
+const goToRegister = () => {
+  if (auth.token) {
+    router.push('/dashboard')
+  } else {
+    router.push('/register')
+  }
+}
 </script>
 
 <template>
@@ -35,12 +65,12 @@ import { LightningIcon, HandshakeIcon, DevicePhoneIcon, ShieldIcon } from '../co
           </div>
           
           <div class="hero-buttons">
-            <router-link to="/register" class="btn-primary btn-large">
+            <button @click="goToRegister" class="btn-primary btn-large">
               Начать страхование
-            </router-link>
-            <router-link to="/login" class="btn-secondary btn-large">
+            </button>
+            <button @click="goToLogin" class="btn-secondary btn-large">
               Войти в аккаунт
-            </router-link>
+            </button>
           </div>
         </div>
         
@@ -102,9 +132,9 @@ import { LightningIcon, HandshakeIcon, DevicePhoneIcon, ShieldIcon } from '../co
       <div class="cta-content">
         <h2>Готовы защитить то, что вам дорого?</h2>
         <p>Присоединяйтесь к тысячам довольных клиентов SafeInsure уже сегодня</p>
-        <router-link to="/register" class="btn-primary btn-large">
+        <button @click="goToRegister" class="btn-primary btn-large">
           Зарегистрироваться бесплатно
-        </router-link>
+        </button>
       </div>
     </div>
   </div>
@@ -206,6 +236,7 @@ import { LightningIcon, HandshakeIcon, DevicePhoneIcon, ShieldIcon } from '../co
 
 .btn-primary:hover {
   box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+  transform: translateY(-2px);
 }
 
 .btn-secondary {
@@ -216,7 +247,9 @@ import { LightningIcon, HandshakeIcon, DevicePhoneIcon, ShieldIcon } from '../co
 
 .btn-secondary:hover {
   color: #2563eb;
+  border-color: #2563eb;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
 }
 
 .hero-image {
