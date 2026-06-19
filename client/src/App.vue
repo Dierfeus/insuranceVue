@@ -3,7 +3,6 @@ import { auth } from './store/auth'
 import { useRouter } from 'vue-router'
 import { RolesEnum } from './type/RolesEnum.ts'
 import { computed } from 'vue'
-import Modal from './store/Modal.ts'
 
 const router = useRouter()
 
@@ -47,5 +46,4 @@ const UserRole = computed((): string => {
 
   </div>
 
-  <Modal />
 </template>
