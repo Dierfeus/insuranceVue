@@ -6,7 +6,7 @@ import { roleMiddleware } from '../middleware/role.middleware.ts'
 const router = Router()
 
 // --- Получить всех клиентов (только работник) ---
-router.get('/', authMiddleware, roleMiddleware(['agent', 'inspector', 'expert']), async (req, res) => {
+router.get('/', authMiddleware,  roleMiddleware(['agent', 'inspector', 'expert', 'admin']), async (req, res) => {
     try {
         const users = await User.find({ role: 'user' }, '-password')
         res.json(users)
@@ -26,7 +26,7 @@ router.put('/me', authMiddleware, async (req: any, res) => {
 })
 
 // --- Обновить клиента (только агент) ---
-router.put('/:id', authMiddleware, roleMiddleware('agent'), async (req, res) => {
+router.put('/:id', authMiddleware,   roleMiddleware(['agent', 'admin']), async (req, res) => {
     try {
         const { username, role } = req.body
         const user = await User.findById(req.params.id)
@@ -50,7 +50,7 @@ router.get('/me', authMiddleware, async (req: any, res) => {
     }
 })
 // --- Удалить клиента (только agent) ---
-router.delete('/:id', authMiddleware, roleMiddleware('agent'), async (req, res) => {
+router.delete('/:id', authMiddleware,   roleMiddleware(['agent', 'admin']), async (req, res) => {
     try {
         const user = await User.findById(req.params.id)
 

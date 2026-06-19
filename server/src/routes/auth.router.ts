@@ -4,6 +4,8 @@ import jwt from 'jsonwebtoken'
 import User from '../models/User.ts'
 import dotenv from 'dotenv'
 dotenv.config()
+import { authMiddleware } from '../middleware/auth-middleware.ts'
+import { roleMiddleware } from '../middleware/role.middleware.ts'
 
 const router = Router()
 
@@ -89,5 +91,47 @@ router.post('/login', async (req, res) => {
         res.status(500).json({ message: 'Server error' })
     }
 })
+
+
+router.post('/admin/create-user', authMiddleware, roleMiddleware('admin'), async (req, res) => {
+        try {
+            const {
+                username,
+                password,
+                role,
+                firstName,
+                lastName,
+                middleName,
+                phone,
+                email,
+                birthDate
+            } = req.body
+
+            const hashed = await bcrypt.hash(password || '123456', 5)
+
+            const user = await User.create({
+                username,
+                password: hashed,
+                role: role || 'user',
+                firstName,
+                lastName,
+                middleName,
+                phone,
+                email,
+                birthDate
+            })
+
+            res.json({
+                message: 'User created',
+                user
+            })
+
+        } catch (err) {
+            res.status(500).json({ message: 'Server error' })
+            console.log(err)
+        }
+    }
+)
+
 
 export default router

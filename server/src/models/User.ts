@@ -1,13 +1,13 @@
 import mongoose from 'mongoose'
 
-export type Role = 'user' | 'agent' | 'inspector' | 'expert'
+export type Role = 'user' | 'agent' | 'inspector' | 'expert' | 'admin'
 
 const UserSchema = new mongoose.Schema({
     username: {type: String, required: true, unique: true, trim: true},
 
     password: {type: String, required: true},
 
-    role: {type: String, enum: ['user', 'agent', 'inspector', 'expert'], default: 'user'},
+    role: {type: String, enum: ['user', 'agent', 'inspector', 'expert', 'admin'], default: 'user'},
 
     firstName: {type: String, required: true, trim: true},
 
