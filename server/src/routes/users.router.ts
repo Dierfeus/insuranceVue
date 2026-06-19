@@ -15,6 +15,18 @@ router.get('/', authMiddleware,  roleMiddleware(['agent', 'inspector', 'expert',
     }
 })
 
+// --- Получить всех работников (для админа) ---
+
+router.get('/employees', authMiddleware, roleMiddleware(['admin']), async (req, res) => {
+    try {
+        const users = await User.find({ role: { $ne: 'user' } }, '-password'  )
+        res.json(users)
+    } catch {
+        res.status(500).json({ message: 'Server error' })
+    }
+})
+
+
 // --- Обновить данные своего аккаунта (любой авторизованный пользователь) ---
 router.put('/me', authMiddleware, async (req: any, res) => {
     try {
