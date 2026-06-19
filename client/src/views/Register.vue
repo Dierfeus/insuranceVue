@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { auth } from '../store/auth'
 import { showError, showSuccess, showInfo } from '../store/Modal'
-import {EyeIcon, EyeOffIcon} from '../components/icons/index'
+import { EyeIcon, EyeOffIcon } from '../components/icons/index'
 
 const firstName = ref('')
 const lastName = ref('')
@@ -216,33 +216,32 @@ const register = async () => {
 
         <div class="form-field">
           <label class="field-label">Пароль</label>
-           <div class="password-wrapper">
-              <input
-                  v-model="password"
-                  :type="showPassword ? 'text' : 'password'"
-                  placeholder="Минимум 6 символов"
-                  class="auth-input"
-                  required
-                />
-
-              <button
-                type="button"
-                class="toggle-password"
-                @click="showPassword = !showPassword"
-              >
+          <div class="password-wrapper">
+            <input
+              v-model="password"
+              :type="showPassword ? 'text' : 'password'"
+              placeholder="Минимум 6 символов"
+              class="auth-input"
+              required
+            />
+            <button
+              type="button"
+              class="toggle-password"
+              @click="showPassword = !showPassword"
+            >
               <EyeOffIcon v-if="showPassword" />
               <EyeIcon v-else />
-              </button>
-            </div>
+            </button>
+          </div>
           <div class="password-hint" v-if="password && password.length < 6">
-            ⚠Пароль должен содержать минимум 6 символов
+            ⚠ Пароль должен содержать минимум 6 символов
           </div>
         </div>
 
         <button 
           type="submit" 
           :disabled="loading" 
-          class="auth-btn"
+          class="auth-btn auth-btn-success"
         >
           {{ loading ? 'Регистрация...' : 'Зарегистрироваться' }}
         </button>
@@ -255,32 +254,22 @@ const register = async () => {
   </div>
 </template>
 
-
 <style scoped>
+/* Только специфичные стили для регистрации */
 .auth-page {
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background: #bae6fd;
-  padding: 20px;
 }
 
 .auth-card {
-  background: #fff;
   border-radius: 20px;
   padding: 32px 36px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-  width: 100%;
   max-width: 440px;
 }
 
 .auth-title {
   font-size: 1.6rem;
-  font-weight: 800;
-  text-align: center;
   margin-bottom: 1.5rem;
-  color: #2563eb;
 }
 
 .auth-form {
@@ -302,15 +291,11 @@ const register = async () => {
 }
 
 .auth-input {
-  width: 100%;
   padding: 10px 14px;
   border: 1.5px solid #e2e8f0;
   border-radius: 10px;
   font-size: 0.95rem;
-  outline: none;
-  transition: 0.2s;
   background: #f8fafc;
-  box-sizing: border-box;
 }
 
 .auth-input:focus {
@@ -324,76 +309,27 @@ const register = async () => {
   font-size: 0.9rem;
 }
 
-.password-wrapper {
-  position: relative;
-}
-
-.password-wrapper .auth-input {
-  padding-right: 44px;
-}
-
-.toggle-password {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 6px;
-}
-
-.toggle-password:hover {
-  background: #f1f5f9;
-}
-
-.password-hint {
-  font-size: 0.75rem;
-  margin-top: 3px;
-  color: #ef4444;
-}
-
-.auth-btn {
-  width: 100%;
+.auth-btn-success {
   padding: 14px;
-  font-weight: 600;
   border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  color: #fff;
   font-size: 1rem;
   margin-top: 8px;
   background: linear-gradient(135deg, #16a34a, #15803d);
-  transition: 0.2s;
 }
 
-.auth-btn:hover:not(:disabled) {
+.auth-btn-success:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(22,163,74,0.35);
 }
 
-.auth-btn:disabled {
+.auth-btn-success:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
 .auth-text-link {
-  text-align: center;
   margin-top: 16px;
   font-size: 0.9rem;
-  color: #64748b;
-}
-
-.auth-text-link a {
-  color: #2563eb;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.auth-text-link a:hover {
-  text-decoration: underline;
 }
 
 @media (max-width: 480px) {
@@ -408,48 +344,5 @@ const register = async () => {
     font-size: 0.9rem;
     padding: 8px 12px;
   }
-}
-.password-wrapper {
-  position: relative;
-}
-
-.password-wrapper .auth-input {
-  padding-right: 48px;
-}
-
-.toggle-password {
-  position: absolute;
-  top: 50%;
-  right: 12px;
-  transform: translateY(-50%);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 28px;
-  height: 28px;
-
-  border: none;
-  background: transparent;
-  cursor: pointer;
-
-  color: #64748b;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-}
-
-.toggle-password svg {
-  width: 20px;
-  height: 20px;
-}
-
-.toggle-password:hover {
-  color: #2563eb;
-  background: rgba(37, 99, 235, 0.08);
-}
-
-.toggle-password:active {
-  transform: translateY(-50%) scale(0.95);
 }
 </style>

@@ -26,8 +26,8 @@ const formData = ref({
   coverage: 500000,
   price: 5000,
   durationDays: 365,
-  images: [], 
-  existingImages: [], 
+  images: [],
+  existingImages: [],
   imagePreviews: []
 });
 
@@ -339,7 +339,7 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div v-if="showForm && canManage" class="form-container">
+    <div v-if="showForm && canManage" class="creation-form-container">
       <h3 class="form-title">{{ isEditing ? 'Редактирование программы' : 'Параметры новой программы' }}</h3>
       
       <form @submit.prevent="submitProgram" class="program-form">
@@ -452,7 +452,7 @@ onMounted(async () => {
 
     <div class="programs-section">
       
-      <div v-if="filteredPrograms.length === 0 && searchQuery" class="empty-search">
+      <div v-if="filteredPrograms.length === 0 && searchQuery" class="empty-state">
         По запросу ничего не найдено
       </div>
 
@@ -510,7 +510,7 @@ onMounted(async () => {
             <button @click="editProgram(prog)" class="btn-edit">
               Редактировать
             </button>
-            <button @click="deleteProgram(prog._id)" class="btn-delete">
+            <button @click="deleteProgram(prog._id)" class="btn-edit btn-danger">
               Удалить
             </button>
           </div>
@@ -523,177 +523,90 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.container {
-  max-width: 1000px;
-  margin: 2rem auto;
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  font-family: 'Inter', sans-serif;
+/* Только специфичные для этого компонента стили */
+.program-image-wrapper {
+  position: relative;
+  width: 100%;
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-}
-
-.main-title {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #2563eb;
-  margin: 0;
-}
-
-.btn-primary {
-  background-color: #2563eb;
-  color: white;
-  padding: 10px 20px;
+.program-image {
+  width: 100%;
+  height: 200px;
   border-radius: 8px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  width: auto;
-}
-
-.btn-primary:hover {
-  background-color: #1d4ed8;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.search-section {
-  margin-bottom: 24px;
-}
-
-.search-wrapper {
+  overflow: hidden;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
 }
 
-.search-input {
+.program-image img {
   width: 100%;
-  padding: 10px 40px 10px 36px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  outline: none;
-  transition: border-color 0.2s;
-  font-size: 0.95rem;
-  background: #f8fafc;
+  height: 100%;
+  object-fit: cover;
 }
 
-.search-input:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  background: white;
-}
-
-.search-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  opacity: 0.6;
-}
-
-.search-clear {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #94a3b8;
-  font-size: 1rem;
-  padding: 4px 8px;
-  border-radius: 20px;
-  transition: all 0.2s;
-}
-
-.search-clear:hover {
-  color: #475569;
-  background: #e2e8f0;
-}
-
-.search-stats {
-  margin-top: 8px;
-  font-size: 0.8rem;
-  color: #64748b;
-}
-
-.form-container {
-  background-color: #f8fafc;
-  padding: 24px;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  margin-bottom: 32px;
-}
-
-.form-title {
-  display: block;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #475569;
-  margin-bottom: 16px;
-}
-
-.program-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-label {
-  display: block;
+.program-image.placeholder {
   font-size: 0.9rem;
-  font-weight: 600;
-  color: #101011;
-  margin-bottom: 4px;
+  color: #94a3b8;
+  text-align: center;
+  padding: 8px;
 }
 
-.form-input,
-.form-select,
-.form-textarea {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  outline: none;
-  transition: border-color 0.2s;
-  font-size: 0.95rem;
-  background: white;
-  font-family: inherit;
+.image-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  z-index: 2;
 }
 
-.form-input:focus,
-.form-select:focus,
-.form-textarea:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+.image-nav:hover {
+  background: rgba(0, 0, 0, 0.8);
 }
 
-.form-textarea {
-  resize: vertical;
-  min-height: 80px;
+.image-nav-prev {
+  left: 8px;
 }
 
-.price-input {
-  font-weight: 600;
-  color: #2563eb;
+.image-nav-next {
+  right: 8px;
+}
+
+.image-counter {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  z-index: 2;
 }
 
 .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 16px;
+}
+
+
+.price-input {
+  font-weight: 600;
+  color: #2563eb;
 }
 
 .form-actions {
@@ -832,217 +745,7 @@ onMounted(async () => {
   transform: scale(1.1);
 }
 
-.programs-section {
-  margin-top: 24px;
-}
-
-.empty-search,
-.empty-state {
-  text-align: center;
-  padding: 40px;
-  color: #94a3b8;
-}
-
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
-}
-
-.card {
-  border: 1px solid #f1f5f9;
-  background: #fff;
-  border-radius: 12px;
-  padding: 16px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  display: flex;
-  flex-direction: column;
-}
-
-.card:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.program-image-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.program-image {
-  width: 100%;
-  height: 200px;
-  border-radius: 8px;
-  overflow: hidden;
-  background: #f1f5f9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.program-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.program-image.placeholder {
-  font-size: 0.9rem;
-  color: #94a3b8;
-  text-align: center;
-  padding: 8px;
-}
-
-.image-nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
-  border: none;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  font-size: 18px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s;
-  z-index: 2;
-}
-
-.image-nav:hover {
-  background: rgba(0, 0, 0, 0.8);
-}
-
-.image-nav-prev {
-  left: 8px;
-}
-
-.image-nav-next {
-  right: 8px;
-}
-
-.image-counter {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 11px;
-  z-index: 2;
-}
-
-.program-footer {
-  margin-top: auto;
-  padding-top: 12px;
-  border-top: 1px solid #f1f5f9;
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.75rem;
-  color: #94a3b8;
-}
-
-.badge-type {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  padding: 4px 8px;
-  background: #eff6ff;
-  color: #2563eb;
-  border-radius: 4px;
-}
-
-.program-price {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #2563eb;
-}
-
-.program-name {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin: 12px 0 8px 0;
-  color: #1e293b;
-}
-
-.program-desc {
-  font-size: 0.875rem;
-  color: #64748b;
-  line-height: 1.5;
-  margin-bottom: 16px;
-  flex: 1;
-}
-
-.card-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #f1f5f9;
-}
-
-.btn-edit {
-  font-size: 0.75rem;
-  padding: 6px 12px;
-  background: #f1f5f9;
-  color: #475569;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-edit:hover {
-  background: #e2e8f0;
-}
-
-.btn-delete {
-  font-size: 0.75rem;
-  padding: 6px 12px;
-  background: #fee2e2;
-  color: #dc2626;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-delete:hover {
-  background: #fecaca;
-}
-
 @media (max-width: 768px) {
-  .container {
-    padding: 16px;
-    margin: 1rem;
-  }
-  
-  .header {
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  .btn-primary {
-    width: 100%;
-    text-align: center;
-  }
-  
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .form-actions {
-    flex-direction: column;
-  }
-  
-  .card-grid {
-    grid-template-columns: 1fr;
-  }
-  
   .program-image {
     height: 180px;
   }
@@ -1051,6 +754,14 @@ onMounted(async () => {
     width: 24px;
     height: 24px;
     font-size: 14px;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-actions {
+    flex-direction: column;
   }
 }
 </style>
