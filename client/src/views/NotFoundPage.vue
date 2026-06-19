@@ -15,13 +15,4 @@
 </template>
 
 <script setup lang="ts">
-// Можно добавить логику, например, логирование 404
 </script>
-
-<style scoped>
-/* Плавная анимация кнопки */
-/* .router-link:hover {
-  transform: scale(1.05);
-  transition: transform 0.2s;
-} */
-</style>

@@ -1,4 +1,3 @@
-// src/store/Modal.ts
 import { ref } from 'vue'
 
 export type ModalType = 'error' | 'info' | 'success' | 'warning' | 'confirm'
@@ -25,7 +24,6 @@ export const modal = ref<ModalState>({
   onCancel: undefined
 })
 
-// Универсальная функция показа модального окна
 export const showModal = (options: {
   type?: ModalType
   title?: string
@@ -47,7 +45,6 @@ export const showModal = (options: {
   }
 }
 
-// Для обратной совместимости с существующим кодом
 export const showError = (msg: string | string[]) => {
   showModal({
     type: 'error',

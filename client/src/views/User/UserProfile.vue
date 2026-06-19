@@ -11,7 +11,6 @@ const editMode = ref(false)
 const loading = ref(false)
 const birthDateString = ref('')
 
-// Загрузка данных пользователя
 const fetchUser = async () => {
   try {
     const token = localStorage.getItem('token')
@@ -20,7 +19,6 @@ const fetchUser = async () => {
     })
     user.value = res.data
 
-    // Преобразуем дату в формат yyyy-MM-dd для input type="date"
     birthDateString.value = user.value.birthDate
         ? user.value.birthDate.split('T')[0]
         : ''
@@ -31,12 +29,10 @@ const fetchUser = async () => {
 
 onMounted(fetchUser)
 
-// Синхронизируем изменения даты с объектом user
 watch(birthDateString, (newVal) => {
   if (user.value) user.value.birthDate = newVal
 })
 
-// Сохранение изменений
 const saveProfile = async () => {
   try {
     loading.value = true

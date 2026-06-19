@@ -1,10 +1,7 @@
 <template>
   <div class="max-w-6xl mx-auto p-4">
 
-    <!-- Вкладки -->
     <div class="flex gap-4 mb-6 border-b pb-2 flex-wrap">
-
-      <!-- Пользователь -->
       <button 
         v-if="role === 'user'" 
         :class="tab === 'myClaims' ? activeTabClass : tabClass" 
@@ -13,7 +10,6 @@
         Мои заявки
       </button>
 
-      <!-- Агент -->
       <button 
         v-if="role === 'agent'" 
         :class="tab === 'claims' ? activeTabClass : tabClass" 
@@ -46,7 +42,6 @@
         Оценка имущества
       </button>
 
-      <!-- Эксперт -->
       <button 
         v-if="role === 'expert'" 
         :class="tab === 'claims' ? activeTabClass : tabClass" 
@@ -71,7 +66,6 @@
         Программы
       </button>
 
-      <!-- Оценщик -->
       <button 
         v-if="role === 'inspector'" 
         :class="tab === 'claims' ? activeTabClass : tabClass" 
@@ -98,24 +92,23 @@
 
     </div>
 
-    <!-- Вкладки контента -->
     <div>
-      <!-- Мои заявки (пользователь) -->
+      <!-- заявки юзера -->
       <UserClaims v-if="tab === 'myClaims' && role === 'user'" />
 
-      <!-- Заявки (агент, эксперт, оценщик) -->
+      <!-- просмотр заявок -->
       <Claims v-if="tab === 'claims' && (role === 'agent' || role === 'expert' || role === 'inspector')" />
 
-      <!-- Клиенты (агент, эксперт, оценщик) -->
+      <!-- клиента -->
       <AgentClients v-if="tab === 'clients' && (role === 'agent' || role === 'expert' || role === 'inspector')" />
 
-      <!-- Договоры (только агент) -->
+      <!-- договоры -->
       <Contracts v-if="tab === 'contracts' && role === 'agent'" />
 
-      <!-- Программы (только эксперт) -->
+      <!-- программы -->
       <InsurancePrograms v-if="tab === 'programs' && role === 'expert'" />
 
-      <!-- Оценка имущества (агент, оценщик) -->
+      <!-- имущество -->
       <Property v-if="tab === 'property' && (role === 'inspector' || role === 'agent')" />
     </div>
 
@@ -137,7 +130,6 @@ const tab = ref<string>('')
 const tabClass = 'px-3 py-1 rounded hover:bg-gray-100 cursor-pointer'
 const activeTabClass = 'px-3 py-1 rounded bg-blue-600 text-white cursor-pointer'
 
-// Функция для получения первой доступной вкладки по роли
 const getDefaultTab = (userRole: string): string => {
   switch (userRole) {
     case 'user':
@@ -157,7 +149,6 @@ onMounted(() => {
   const userRole = localStorage.getItem('role')
   role.value = userRole
   
-  // Устанавливаем первую доступную вкладку
   if (userRole) {
     tab.value = getDefaultTab(userRole)
   }
@@ -169,7 +160,6 @@ button {
   transition: all 0.2s; 
 }
 
-/* Стили для активной вкладки */
 .bg-blue-600 {
   background-color: #2563eb;
 }

@@ -11,12 +11,10 @@ const token = localStorage.getItem('token')
 const role = auth.role
 const searchQuery = ref('')
 
-// Поля для формы оценки
 const selectedClaim = ref<any>(null)
 const evaluationValue = ref(0)
 const evaluationDescription = ref('')
 
-// --- ПОИСК ДЛЯ ЗАЯВОК НА ОЦЕНКУ ---
 const filteredClaims = computed(() => {
   if (!searchQuery.value) return claims.value
   
@@ -35,7 +33,6 @@ const filteredClaims = computed(() => {
   })
 })
 
-// --- ПОИСК ДЛЯ АРХИВА ОЦЕНОК ---
 const filteredProperties = computed(() => {
   if (!searchQuery.value) return properties.value
   

@@ -13,7 +13,6 @@ const token = localStorage.getItem('token');
 const fileInput = ref(null);
 const userRole = ref(null);
 
-// 🆕 Для карусели - используем обычный объект вместо сложного типа
 const currentImageIndex = ref({});
 
 const canManage = computed(() => {
@@ -27,9 +26,9 @@ const formData = ref({
   coverage: 500000,
   price: 5000,
   durationDays: 365,
-  images: [], // 🆕 массив файлов
-  existingImages: [], // 🆕 существующие URL
-  imagePreviews: [] // 🆕 превью для отображения
+  images: [], 
+  existingImages: [], 
+  imagePreviews: []
 });
 
 const filteredPrograms = computed(() => {
@@ -69,7 +68,6 @@ const getImageUrl = (imagePath) => {
   return `http://localhost:5000${normalizedPath}`;
 };
 
-// 🆕 Управление каруселью
 const getCurrentImageIndex = (programId) => {
   return currentImageIndex.value[programId] || 0;
 };
@@ -114,7 +112,6 @@ const fetchPrograms = async () => {
   }
 };
 
-// 🆕 Обработка загрузки нескольких файлов
 const handleFileUpload = (event) => {
   const files = event.target.files;
   if (!files || files.length === 0) return;
@@ -137,7 +134,6 @@ const handleFileUpload = (event) => {
     reader.readAsDataURL(file);
   }
   
-  // Сбрасываем input
   if (fileInput.value) fileInput.value.value = '';
 };
 
@@ -234,14 +230,12 @@ const submitProgram = async () => {
     submitData.append('price', formData.value.price);
     submitData.append('durationDays', formData.value.durationDays);
     
-    // 🆕 Добавляем существующие изображения
     if (formData.value.existingImages.length > 0) {
       for (const img of formData.value.existingImages) {
         submitData.append('existingImages', img);
       }
     }
     
-    // 🆕 Добавляем новые изображения
     for (const file of formData.value.images) {
       submitData.append('images', file);
     }
@@ -323,7 +317,6 @@ onMounted(async () => {
       </button>
     </div>
 
-    <!-- ПОИСК -->
     <div class="search-section">
       <div class="search-wrapper">
         <input
@@ -346,7 +339,6 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- ФОРМА -->
     <div v-if="showForm && canManage" class="form-container">
       <h3 class="form-title">{{ isEditing ? 'Редактирование программы' : 'Параметры новой программы' }}</h3>
       
@@ -415,7 +407,6 @@ onMounted(async () => {
           ></textarea>
         </div>
 
-        <!-- 🆕 Загрузка нескольких изображений -->
         <div class="form-group">
           <label class="form-label">Изображения программы (до 5 шт.)</label>
           <div class="file-upload-wrapper">
@@ -436,7 +427,6 @@ onMounted(async () => {
             />
           </div>
           
-          <!-- 🆕 Превью загруженных изображений -->
           <div v-if="formData.imagePreviews.length > 0 || formData.existingImages.length > 0" class="image-previews">
             <div v-for="(img, index) in formData.imagePreviews" :key="'new-' + index" class="image-preview-item">
               <img :src="img" alt="Preview" />
@@ -460,7 +450,6 @@ onMounted(async () => {
       </form>
     </div>
 
-    <!-- СПИСОК ПРОГРАММ -->
     <div class="programs-section">
       
       <div v-if="filteredPrograms.length === 0 && searchQuery" class="empty-search">
@@ -474,7 +463,6 @@ onMounted(async () => {
       <div class="card-grid">
         <div v-for="prog in filteredPrograms" :key="prog._id" class="card">
 
-          <!-- 🆕 Карусель изображений -->
           <div class="program-image-wrapper">
             <div class="program-image" v-if="prog.images && prog.images.length > 0">
               <img 
@@ -482,7 +470,6 @@ onMounted(async () => {
                 :alt="prog.name" 
                 @error="handleImageError"
               />
-              <!-- 🆕 Кнопки навигации -->
               <button 
                 v-if="hasMultipleImages(prog)" 
                 class="image-nav image-nav-prev" 
@@ -497,7 +484,6 @@ onMounted(async () => {
               >
                 ›
               </button>
-              <!-- 🆕 Индикатор количества -->
               <span v-if="hasMultipleImages(prog)" class="image-counter">
                 {{ getCurrentImageIndex(prog._id) + 1 }} / {{ prog.images.length }}
               </span>
@@ -801,7 +787,6 @@ onMounted(async () => {
   color: #94a3b8;
 }
 
-/* 🆕 Превью загруженных изображений */
 .image-previews {
   display: flex;
   flex-wrap: wrap;
@@ -847,7 +832,6 @@ onMounted(async () => {
   transform: scale(1.1);
 }
 
-/* Список программ */
 .programs-section {
   margin-top: 24px;
 }
@@ -859,7 +843,6 @@ onMounted(async () => {
   color: #94a3b8;
 }
 
-/* Карточки */
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -880,7 +863,6 @@ onMounted(async () => {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-/* 🆕 Стили для карусели */
 .program-image-wrapper {
   position: relative;
   width: 100%;
@@ -911,7 +893,6 @@ onMounted(async () => {
   padding: 8px;
 }
 
-/* 🆕 Кнопки навигации */
 .image-nav {
   position: absolute;
   top: 50%;
@@ -943,7 +924,6 @@ onMounted(async () => {
   right: 8px;
 }
 
-/* 🆕 Индикатор количества */
 .image-counter {
   position: absolute;
   bottom: 8px;
@@ -1035,7 +1015,6 @@ onMounted(async () => {
   background: #fecaca;
 }
 
-/* Адаптивность */
 @media (max-width: 768px) {
   .container {
     padding: 16px;

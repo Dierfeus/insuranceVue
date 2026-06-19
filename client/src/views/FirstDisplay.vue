@@ -7,14 +7,12 @@ import { onMounted } from 'vue'
 
 const router = useRouter()
 
-// Если пользователь уже авторизован - перенаправляем в дашборд
 onMounted(() => {
   if (auth.token) {
     router.push('/dashboard')
   }
 })
 
-// Функция для перехода на страницу входа с проверкой
 const goToLogin = () => {
   if (auth.token) {
     router.push('/dashboard')
@@ -23,7 +21,6 @@ const goToLogin = () => {
   }
 }
 
-// Функция для перехода на страницу регистрации с проверкой
 const goToRegister = () => {
   if (auth.token) {
     router.push('/dashboard')

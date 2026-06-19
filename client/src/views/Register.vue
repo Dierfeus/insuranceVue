@@ -17,12 +17,10 @@ const showPassword = ref(false)
 
 const router = useRouter()
 
-// Форматирование телефона
 const formatPhone = (e: Event) => {
   const input = e.target as HTMLInputElement
   let value = input.value.replace(/\D/g, '')
   
-  // Ограничиваем 11 цифрами
   if (value.length > 11) value = value.slice(0, 11)
   
   let result = ''
@@ -144,7 +142,6 @@ const register = async () => {
 
       <form @submit.prevent="register" class="auth-form">
         
-        <!-- ФИО -->
         <div class="form-field">
           <label class="field-label">Фамилия</label>
           <input 
@@ -174,7 +171,6 @@ const register = async () => {
           />
         </div>
 
-        <!-- Контакты -->
         <div class="form-field">
           <label class="field-label">Номер телефона</label>
           <input 
@@ -207,7 +203,6 @@ const register = async () => {
           />
         </div>
 
-        <!-- Аккаунт -->
         <div class="form-field">
           <label class="field-label">Логин</label>
           <input 
@@ -233,11 +228,11 @@ const register = async () => {
               class="toggle-password"
               @click="showPassword = !showPassword"
             >
-              {{ showPassword ? '🙈' : '👁️' }}
+              {{ showPassword ? 'скрыть' : 'показать' }}
             </button>
           </div>
           <div class="password-hint" v-if="password && password.length < 6">
-            ⚠️ Пароль должен содержать минимум 6 символов
+            ⚠Пароль должен содержать минимум 6 символов
           </div>
         </div>
 
@@ -326,7 +321,6 @@ const register = async () => {
   font-size: 0.9rem;
 }
 
-/* Пароль */
 .password-wrapper {
   position: relative;
 }
@@ -358,7 +352,6 @@ const register = async () => {
   color: #ef4444;
 }
 
-/* Кнопка */
 .auth-btn {
   width: 100%;
   padding: 14px;

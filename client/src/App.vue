@@ -3,7 +3,7 @@ import { auth } from './store/auth'
 import { useRouter } from 'vue-router'
 import { RolesEnum } from './type/RolesEnum.ts'
 import { computed } from 'vue'
-import Modal from './components/Modal.vue'
+import Modal from './store/Modal.ts'
 
 const router = useRouter()
 
@@ -24,16 +24,11 @@ const UserRole = computed((): string => {
 <template>
   <div class="page-wrapper">
 
-    <!-- Хедер -->
     <header class="header">
-
-        <!-- Логотип слева -->
         <div class="logo" @click="router.push('/')">
           <div class="logo-icon">БС</div>
           <span class="logo-text">Безопасное страхование</span>
         </div>
-
-        <!-- Кнопки справа -->
         <div class="header-actions">
           <button v-if="auth.token && auth.role === 'user'" @click="router.push('/profile')" class="btn btn-profile">
             Профиль
@@ -52,6 +47,5 @@ const UserRole = computed((): string => {
 
   </div>
 
-  <!-- общее модальное окно ошибок-->
   <Modal />
 </template>

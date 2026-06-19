@@ -45,10 +45,9 @@ const selectedClient = reactive<Client>({
   birthDate: ''
 })
 
-const birthDateString = ref('')  // для input type=date
+const birthDateString = ref('') 
 const token = localStorage.getItem('token')
 
-// Загрузка списка клиентов
 const loadClients = async () => {
   try {
     const res = await axios.get('http://localhost:5000/api/users', {
@@ -60,19 +59,16 @@ const loadClients = async () => {
   }
 }
 
-// Открытие модального окна для редактирования
 const editClient = (client: Client) => {
   Object.assign(selectedClient, client)
   birthDateString.value = client.birthDate ? client.birthDate.split('T')[0] : ''
   showModal.value = true
 }
 
-// Синхронизация даты с объектом клиента
 watch(birthDateString, (newVal) => {
   if (selectedClient) selectedClient.birthDate = newVal
 })
 
-// Сохранение изменений клиента
 const updateClient = async () => {
   try {
     loading.value = true
@@ -99,7 +95,6 @@ const updateClient = async () => {
   }
 }
 
-// Удаление клиента с подтверждением
 const deleteClient = (id: string) => {
   showConfirm({
     title: 'Удаление клиента',
@@ -126,12 +121,10 @@ onMounted(loadClients)
 <template>
   <div class="container">
 
-    <!-- HEADER -->
     <div class="header">
       <h2 class="main-title">Управление клиентами</h2>
     </div>
 
-    <!-- ПОИСК -->
     <div style="margin-bottom: 24px;">
       <div style="position: relative;">
         <input
@@ -155,7 +148,6 @@ onMounted(loadClients)
       </div>
     </div>
 
-    <!-- Список клиентов -->
     <div v-if="filteredClients.length === 0 && searchQuery" style="text-align: center; padding: 40px; color: #94a3b8;">
       По запросу ничего не найдено
     </div>
@@ -206,7 +198,6 @@ onMounted(loadClients)
 
     </div>
 
-    <!-- МОДАЛКА РЕДАКТИРОВАНИЯ -->
     <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
       <div class="modal-card" style="max-width: 500px;">
         <div class="modal-header" style="border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px;">

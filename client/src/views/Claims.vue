@@ -14,7 +14,6 @@ const searchQuery = ref('')
 
 const token = localStorage.getItem('token')
 
-// --- ошибки ---
 const errors = reactive({
   phone: '',
   program: '',
@@ -24,7 +23,6 @@ const errors = reactive({
 const today = new Date()
 const minStartDate = today.toISOString().split('T')[0]
 
-// --- форма ---
 const newClaim = reactive({
   userId: '',
   phone: '',
@@ -37,7 +35,6 @@ const newClaim = reactive({
   startDate: ''
 })
 
-// --- тип программы ---
 const selectedProgramType = computed(() => {
   const program = programs.value.find(
       p => String(p._id) === String(newClaim.programId)
@@ -45,12 +42,10 @@ const selectedProgramType = computed(() => {
   return program?.type || ''
 })
 
-// --- статус ---
 const getStatusText = (status: keyof typeof StatusEnum) => {
   return StatusEnum[status] || status
 }
 
-// --- ПОИСК ---
 const filteredClaims = computed(() => {
   if (!searchQuery.value) return claims.value
   
@@ -68,7 +63,6 @@ const filteredClaims = computed(() => {
   })
 })
 
-// --- проверка возможности изменения статуса ---
 const canApprove = (status: string) => {
   return status === 'pending' || status === 'evaluated'
 }
@@ -77,7 +71,6 @@ const canReject = (status: string) => {
   return status === 'pending'
 }
 
-// --- загрузка ---
 const loadPrograms = async () => {
   try {
     const res = await axios.get('http://localhost:5000/api/programs', {
@@ -120,7 +113,6 @@ const loadClaims = async () => {
   }
 }
 
-// --- ВАЛИДАЦИЯ ---
 const validate = () => {
   errors.phone = ''
   errors.program = ''
@@ -146,7 +138,6 @@ const validate = () => {
   return isValid
 }
 
-// --- создание ---
 const submitClaim = async () => {
   if (!validate()) return
 
@@ -164,7 +155,6 @@ const submitClaim = async () => {
         { headers: { Authorization: `Bearer ${token}` } }
     )
 
-    // reset
     Object.assign(newClaim, {
       userId: '',
       phone: '',
@@ -188,12 +178,10 @@ const submitClaim = async () => {
   }
 }
 
-// --- очистка ошибок при вводе ---
 watch(() => newClaim.phone, () => errors.phone = '')
 watch(() => newClaim.programId, () => errors.program = '')
 watch(() => newClaim.startDate, () => errors.startDate = '')
 
-// --- действия ---
 const deleteClaim = (id: string) => {
   showConfirm({
     title: 'Удаление заявки',
@@ -257,7 +245,6 @@ onMounted(async () => {
 <template>
   <div class="container">
 
-    <!-- HEADER -->
     <div class="header">
       <h2 class="main-title">Страховые заявки</h2>
 
@@ -271,7 +258,6 @@ onMounted(async () => {
       </button>
     </div>
 
-    <!-- ПОИСК -->
     <div style="margin-bottom: 24px;">
       <div style="position: relative;">
         <input
@@ -295,13 +281,11 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- ФОРМА -->
     <div v-if="showCreateClaim" class="creation-form-container">
       <span class="form-title">Создание заявки</span>
 
       <form @submit.prevent="submitClaim">
 
-        <!-- телефон -->
         <div v-if="role === 'agent'" class="form-group">
           <label class="form-label">Телефон клиента</label>
           <input
@@ -313,7 +297,6 @@ onMounted(async () => {
           </p>
         </div>
 
-        <!-- программа -->
         <div class="form-group">
           <label class="form-label">Программа</label>
 
@@ -329,25 +312,21 @@ onMounted(async () => {
           </p>
         </div>
 
-        <!-- дом -->
         <div v-if="selectedProgramType === 'home'" class="form-group">
           <label class="form-label">Адрес</label>
           <input v-model="newClaim.propertyData.address" class="form-input" />
         </div>
 
-        <!-- авто -->
         <div v-if="selectedProgramType === 'car'" class="form-group">
           <label class="form-label">Модель авто</label>
           <input v-model="newClaim.propertyData.carModel" class="form-input" />
         </div>
 
-        <!-- срок -->
         <div class="form-group">
           <label class="form-label">Срок (дней)</label>
           <input type="number" v-model.number="newClaim.durationDays" class="form-input"/>
         </div>
 
-        <!-- дата -->
         <div class="form-group">
           <label class="form-label">Дата начала</label>
 
@@ -410,10 +389,7 @@ onMounted(async () => {
           </span>
         </div>
 
-        <!-- ДЕЙСТВИЯ -->
         <div class="card-actions">
-
-          <!-- Пользователь: удаление только своих pending заявок -->
           <button
               v-if="role === 'user' && claim.status === 'pending'"
               @click="deleteClaim(claim._id)"
@@ -423,7 +399,6 @@ onMounted(async () => {
             Удалить
           </button>
 
-          <!-- Агент: одобрение/отклонение в зависимости от статуса -->
           <template v-if="role === 'agent'">
             <button 
               v-if="canApprove(claim.status)"

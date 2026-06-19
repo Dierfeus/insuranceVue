@@ -21,7 +21,6 @@ const contract = ref({
   properties: [] as string[]
 })
 
-// --- ПОИСК ДОГОВОРОВ ---
 const filteredContracts = computed(() => {
   if (!searchQuery.value) return contracts.value
   
@@ -38,7 +37,6 @@ const filteredContracts = computed(() => {
   })
 })
 
-// --- загрузка заявок ---
 const fetchClaims = async () => {
   try {
     const res = await axios.get('http://localhost:5000/api/claims', {
@@ -65,11 +63,9 @@ watch(selectedClaimId, async (val) => {
     properties: []
   }
 
-  // ГРУЗИМ ИМУЩЕСТВО КЛИЕНТА
   await fetchPropertiesByClient(claim.user?._id)
 })
 
-// --- создание договора ---
 const submitContract = async () => {
   if (!contract.value.claimId) {
     showInfo('Выберите заявку для создания договора')
@@ -88,7 +84,6 @@ const submitContract = async () => {
     showSuccess('Договор успешно создан')
     await fetchContracts()
 
-    // сброс
     contract.value = {
       claimId: '',
       startDate: '',
@@ -117,7 +112,6 @@ const fetchPropertiesByClient = async (clientId: string) => {
     selectedProperties.value = res.data
     contract.value.properties = res.data.map((p: any) => p._id)
 
-    // считаем премию
     contract.value.premiumAmount = res.data.reduce(
         (sum: number, p: any) => sum + (p.value || 0),
         0
@@ -153,7 +147,6 @@ onMounted(() => {
 <template>
   <div class="container">
 
-    <!-- HEADER -->
     <div class="header">
       <h2 class="main-title">Список договоров</h2>
 
@@ -166,7 +159,6 @@ onMounted(() => {
       </button>
     </div>
 
-    <!-- ПОИСК -->
     <div style="margin-bottom: 24px;">
       <div style="position: relative;">
         <input
@@ -190,12 +182,10 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- ФОРМА -->
     <div v-if="showCreateForm" class="creation-form-container">
 
       <h3 class="form-title">Создание договора</h3>
 
-      <!-- выбор заявки -->
       <div class="form-group">
         <label class="form-label">Одобренная заявка</label>
         <select v-model="selectedClaimId" class="form-select">
@@ -212,7 +202,6 @@ onMounted(() => {
         </select>
       </div>
 
-      <!-- если выбрана -->
       <form
           v-if="selectedClaimId"
           @submit.prevent="submitContract"
@@ -238,7 +227,6 @@ onMounted(() => {
 
         </div>
 
-        <!-- имущество -->
         <div class="form-group">
           <label class="form-label">Имущество клиента</label>
 
@@ -274,7 +262,6 @@ onMounted(() => {
       </form>
     </div>
 
-    <!-- СПИСОК ДОГОВОРОВ -->
     <div style="margin-top: 24px;">
 
       <div v-if="filteredContracts.length === 0 && searchQuery" style="text-align: center; padding: 40px; color: #94a3b8;">
