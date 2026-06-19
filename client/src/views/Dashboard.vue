@@ -152,6 +152,8 @@ const getDefaultTab = (userRole: string): string => {
       return 'claims'
     case 'inspector':
       return 'claims'
+    case 'admin':
+      return 'adminCreateuser'
     default:
       return ''
   }
