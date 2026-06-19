@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { auth } from '../store/auth'
 import { showError, showSuccess, showInfo } from '../store/Modal'
+import {EyeIcon, EyeOffIcon} from '../components/icons/index'
 
 const firstName = ref('')
 const lastName = ref('')
@@ -215,22 +216,24 @@ const register = async () => {
 
         <div class="form-field">
           <label class="field-label">Пароль</label>
-          <div class="password-wrapper">
-            <input 
-              v-model="password" 
-              :type="showPassword ? 'text' : 'password'" 
-              placeholder="Минимум 6 символов" 
-              class="auth-input"
-              required
-            />
-            <button 
-              type="button" 
-              class="toggle-password"
-              @click="showPassword = !showPassword"
-            >
-              {{ showPassword ? 'скрыть' : 'показать' }}
-            </button>
-          </div>
+           <div class="password-wrapper">
+              <input
+                  v-model="password"
+                  :type="showPassword ? 'text' : 'password'"
+                  placeholder="Минимум 6 символов"
+                  class="auth-input"
+                  required
+                />
+
+              <button
+                type="button"
+                class="toggle-password"
+                @click="showPassword = !showPassword"
+              >
+              <EyeOffIcon v-if="showPassword" />
+              <EyeIcon v-else />
+              </button>
+            </div>
           <div class="password-hint" v-if="password && password.length < 6">
             ⚠Пароль должен содержать минимум 6 символов
           </div>
@@ -259,7 +262,7 @@ const register = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f0f9ff 0%, #bae6fd 100%);
+  background: #bae6fd;
   padding: 20px;
 }
 
@@ -405,5 +408,48 @@ const register = async () => {
     font-size: 0.9rem;
     padding: 8px 12px;
   }
+}
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper .auth-input {
+  padding-right: 48px;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 28px;
+  height: 28px;
+
+  border: none;
+  background: transparent;
+  cursor: pointer;
+
+  color: #64748b;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.toggle-password svg {
+  width: 20px;
+  height: 20px;
+}
+
+.toggle-password:hover {
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.08);
+}
+
+.toggle-password:active {
+  transform: translateY(-50%) scale(0.95);
 }
 </style>

@@ -90,6 +90,14 @@
         Оценка имущества
       </button>
 
+      <button 
+        v-if="role === 'admin'" 
+        :class="tab === 'adminCreateuser' ? activeTabClass : tabClass" 
+        @click="tab = 'adminCreateuser'"
+      >
+        Создание Пользователей
+      </button>
+
     </div>
 
     <div>
@@ -110,6 +118,9 @@
 
       <!-- имущество -->
       <Property v-if="tab === 'property' && (role === 'inspector' || role === 'agent')" />
+
+      <!-- имущество -->
+      <AdminCreateUser v-if="tab === 'adminCreateuser' && (role === 'admin')" />
     </div>
 
   </div>
@@ -123,6 +134,7 @@ import AgentClients from "./Agent/AgentClients.vue"
 import Contracts from "./Agent/Contracts.vue"
 import InsurancePrograms from "./InsurancePrograms.vue"
 import Property from "./Property.vue"
+import AdminCreateUser from "./AdminCreateUser.vue"
 
 const role = ref<string | null>(null)
 const tab = ref<string>('')
