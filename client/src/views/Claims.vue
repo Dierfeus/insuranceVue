@@ -361,9 +361,7 @@ onMounted(async () => {
           <span class="badge-type">
             №{{ claim._id.slice(-6) }}
           </span>
-          <span style="font-size: 10px; color: #64748b;">
-            {{ getCreatorLabel(claim.creatorRole) }}
-          </span>
+
         </div>
 
         <div class="program-name">
